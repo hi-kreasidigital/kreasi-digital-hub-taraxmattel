@@ -1,0 +1,49 @@
+{
+  "_catatan": "Konten cadangan. Dipakai hanya bila AIRTABLE_TOKEN belum diatur. Isinya sama dengan isi awal base Airtable.",
+  "judul_section": [
+    {"Section": "Freebies", "Label ID": "Freebies", "Label EN": "Freebies", "Judul ID": "Freebies untuk kamu yang ingin mengembangkan diri", "Judul EN": "Freebies for you who want to grow", "Pengantar ID": "Alat kecil yang kami pakai sendiri. Unduh gratis.", "Pengantar EN": "Small tools we use ourselves. Download them for free."},
+    {"Section": "Portfolio", "Label ID": "Portfolio", "Label EN": "Portfolio", "Judul ID": "Portfolio Tara x Mattel", "Judul EN": "Portfolio Tara x Mattel", "Pengantar ID": "Website yang sudah kami buat.", "Pengantar EN": "Websites we have made."},
+    {"Section": "Representation", "Label ID": "Representation", "Label EN": "Representation", "Judul ID": "Representation", "Judul EN": "Representation"}
+  ],
+  "tentang": [
+    {"Nama": "Tentang Tara x Mattel", "Judul Section ID": "Tentang Tara x Mattel", "Judul Section EN": "About Tara x Mattel",
+     "Paragraf ID": "Kami Tara dan Mattel, dua perempuan usia 40-an. Tara seorang akuntan, Mattel desainer di agensi iklan. Di sini kami berbagi pelajaran yang kami dapat pelan-pelan soal mengenal diri, keluarga, pekerjaan, dan uang. Kenapa kami melakukannya? Karena dulu kami juga mencari jawaban sendirian, dan sekarang saatnya memberi kembali: cerita yang apa adanya dan satu langkah kecil yang bisa langsung kamu coba.",
+     "Paragraf EN": "We are Tara and Mattel, two women in our 40s. Tara is an accountant, Mattel a designer at an ad agency. Here we share what we learned the slow way about knowing yourself, family, work and money. Why do we do it? Because we once searched for answers on our own, and now it is our turn to give back: honest stories and one small step you can try right away.",
+     "Link YouTube": "https://www.youtube.com/@taraxmattel", "Link Instagram": "https://www.instagram.com/taraxmattel/",
+     "Tombol YouTube ID": "Tonton di YouTube", "Tombol YouTube EN": "Watch on YouTube", "Tombol Instagram ID": "Ikuti di Instagram", "Tombol Instagram EN": "Follow on Instagram"}
+  ],
+  "freebies": [],
+  "usaha": [
+    {"Nama Produk": "Queer Business Hub", "Judul Section ID": "Untuk Pemilik Usaha", "Judul Section EN": "For Business Owners", "Keterangan ID": "Untuk kamu yang punya usaha", "Keterangan EN": "For you who run a business",
+     "Paragraf ID": "Queer Business Hub sedang kami siapkan sebagai tempat pelaku usaha untuk saling belajar, bertumbuh bersama, dan membangun etalase ekonomi bersama lewat Pasar Inklusif. Dari komunitas, untuk komunitas.",
+     "Paragraf EN": "We are building Queer Business Hub as a place for business owners to learn from each other, grow together and build a shared marketplace through Pasar Inklusif. From the community, for the community.",
+     "Link": "https://hi-kreasidigital.github.io/QBH/landing2/", "Segera Hadir": true, "Tampilkan": true}
+  ],
+  "skill": [
+    {"Nama Produk": "CARI SKILL", "Judul Section ID": "Untuk Pemilik Skill", "Judul Section EN": "For People with Skills", "Keterangan ID": "Untuk kamu yang punya skill", "Keterangan EN": "For you who have a skill",
+     "Paragraf ID": "Daftarkan keahlianmu di CARI SKILL, direktori penyedia jasa untuk komunitas kita, supaya orang yang butuh bisa menemukanmu. Kontak pribadimu tidak ditampilkan: pesan dari pencari jasa kami teruskan lewat email. Teruskan kebaikan, satu jasa pada satu waktu.",
+     "Paragraf EN": "List your skill on CARI SKILL, a directory of service providers for our community, so the people who need you can find you. Your personal contacts stay hidden: messages from people looking for help are forwarded to you by email. Pay it forward, one service at a time.",
+     "Tombol ID": "Daftar di sini", "Tombol EN": "Sign up here", "Link": "https://cari-skill.netlify.app/", "Tampilkan": true}
+  ],
+  "seni": [
+    {"Nama Produk": "Queer & Artsy", "Judul Section ID": "Untuk Seniman Visual", "Judul Section EN": "For Visual Artists", "Keterangan ID": "Untuk kamu yang punya bakat seni visual", "Keterangan EN": "For you with a talent for visual art",
+     "Paragraf ID": "Queer & Artsy adalah gerakan seni jalanan queer yang mengangkat isu seperti homofobia, HIV, dan ketidaksetaraan yang dihadapi komunitas. Ikuti Instagram-nya untuk melihat karya, kolaborasi, dan kesempatan ikut berkarya.",
+     "Paragraf EN": "Queer & Artsy is a queer street art movement that brings focus to homophobia, HIV and the inequalities our community faces. Follow along on Instagram to see the work, collaborations and chances to create together.",
+     "Tombol ID": "Follow Instagram", "Tombol EN": "Follow on Instagram", "Link": "https://www.instagram.com/queerandartsy/", "Tampilkan": true}
+  ],
+  "ngo": [
+    {"Nama Produk": "Akunting Nirlaba ISAK 335", "Judul Section ID": "Untuk Yayasan & NGO", "Judul Section EN": "For Foundations & NGOs", "Keterangan ID": "Untuk kamu yang mengelola keuangan yayasan atau NGO", "Keterangan EN": "For you who manage the finances of a foundation or NGO",
+     "Paragraf ID": "Catat transaksi, pisahkan dana tanpa dan dengan pembatasan, pantau penyerapan dana per donor, dan susun laporan keuangan sesuai ISAK 335 tanpa spreadsheet berlapis. Berbasis web, bisa dipakai oleh banyak lembaga, dan cukup sekali bayar tanpa langganan.",
+     "Paragraf EN": "Record transactions, separate restricted and unrestricted funds, track how each donor's funds are spent, and prepare ISAK 335 financial statements without layers of spreadsheets. Web-based, ready for many organisations, and a one-time payment with no subscription.",
+     "Segera Hadir": true, "Tampilkan": true}
+  ],
+  "portfolio": [
+    {"Judul": "Fajar Sikka", "Jenis": "Website", "Keterangan ID": "Website komunitas bilingual untuk Fajar Sikka di Maumere, Flores.", "Keterangan EN": "Bilingual community website for Fajar Sikka in Maumere, Flores.", "Link": "https://hi-kreasidigital.github.io/fajar-sikka/", "Urutan": 1, "Tampilkan": true},
+    {"Judul": "Teman Pulih", "Jenis": "Website", "Keterangan ID": "Website sound healing dan konseling Teman Pulih.", "Keterangan EN": "Sound healing and counselling website for Teman Pulih.", "Link": "https://hi-kreasidigital.github.io/teman-pulih/", "Urutan": 2, "Tampilkan": true},
+    {"Judul": "Nourish & Flow", "Jenis": "Website", "Keterangan ID": "Website studio gerak dan kuliner vegan Nourish & Flow di Bali.", "Keterangan EN": "Website for Nourish & Flow, a movement and vegan food studio in Bali.", "Link": "https://hi-kreasidigital.github.io/nourish-flow/", "Urutan": 3, "Tampilkan": true}
+  ],
+  "representation": [],
+  "footer": [
+    {"Nama": "Footer", "Tagline ID": "Cerita jujur, langkah nyata.", "Tagline EN": "Honest stories, real steps.", "Hak Cipta": "© 2026 Kreasi Digital Hub by Tara x Mattel"}
+  ]
+}

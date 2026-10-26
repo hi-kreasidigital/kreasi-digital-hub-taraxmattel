@@ -1,0 +1,192 @@
+{% set wave %}<svg class="eyebrow-icon" width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M1 4 Q4 1 7 4 T13 4 T19 4 T25 4"/><path d="M1 9 Q4 6 7 9 T13 9 T19 9 T25 9"/><path d="M1 14 Q4 11 7 14 T13 14 T19 14 T25 14"/></svg>{% endset %}
+{% set arrow %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>{% endset %}
+{% set ig_icon %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>{% endset %}
+{% set yt_icon %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg>{% endset %}
+{% macro head(key, motif, rotate=false) %}{% set h = heads.get(key, {}) %}
+<div class="section-head">
+  <div class="section-head__text">
+    <p class="eyebrow">{{ wave }}{{ h.get('Label ' ~ L) or key }}</p>
+    <h2 class="h2">{{ h.get('Judul ' ~ L) or key }}</h2>
+    {% if h.get('Pengantar ' ~ L) %}<p class="lead">{{ h.get('Pengantar ' ~ L) }}</p>{% endif %}
+  </div>
+  <img class="motif{% if rotate %} motif--turn{% endif %}" src="{{ r }}assets/img/motif/{{ motif }}.svg" alt="" aria-hidden="true" width="240" height="240" loading="lazy">
+</div>
+{% endmacro %}
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ site.site_name }}</title>
+<meta name="description" content="{{ ui.description }}">
+<link rel="canonical" href="{{ site_url }}{% if lang == 'en' %}en/{% endif %}">
+<link rel="alternate" hreflang="id" href="{{ site_url }}">
+<link rel="alternate" hreflang="en" href="{{ site_url }}en/">
+<link rel="alternate" hreflang="x-default" href="{{ site_url }}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ site.site_name }}">
+<meta property="og:description" content="{{ ui.description }}">
+<meta property="og:url" content="{{ site_url }}{% if lang == 'en' %}en/{% endif %}">
+<meta property="og:image" content="{{ site_url }}assets/img/og-image.jpg">
+<meta property="og:locale" content="{{ 'id_ID' if lang == 'id' else 'en_US' }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0F2A4A">
+<link rel="icon" type="image/png" href="{{ r }}assets/img/favicon.png">
+<link rel="apple-touch-icon" href="{{ r }}assets/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Lora:ital,wght@1,500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="{{ r }}assets/css/site.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"{{ site.site_name }}","url":"{{ site_url }}","logo":"{{ site_url }}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png","sameAs":["{{ about.get('Link YouTube','') }}","{{ about.get('Link Instagram','') }}"]}</script>
+</head>
+<body>
+<a class="skip" href="#konten">{{ ui.skip }}</a>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__logo" href="{{ r if r else './' }}"><img src="{{ r }}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png" alt="{{ site.site_name }}" width="845" height="146"></a>
+    <div class="lang" role="group" aria-label="{{ ui.lang_label }}" data-lang="{{ lang }}">
+      <span class="lang__pill" aria-hidden="true"></span>
+      <a class="lang__opt" href="{{ r if r else './' }}" hreflang="id" lang="id" {% if lang == 'id' %}aria-current="true"{% endif %}>ID</a>
+      <a class="lang__opt" href="{{ r }}en/" hreflang="en" lang="en" {% if lang == 'en' %}aria-current="true"{% endif %}>EN</a>
+    </div>
+  </div>
+</header>
+
+<main id="konten">
+
+<!-- Tentang -->
+<section class="section bg-white" id="tentang">
+  <div class="wrap hero">
+    <div class="hero__text">
+      <p class="eyebrow">{{ wave }}{{ about.get('Judul Section ' ~ L) }}</p>
+      <p class="hero__lead">{{ about.get('Paragraf ' ~ L) }}</p>
+      <div class="btn-row">
+        {% if about.get('Link YouTube') %}<a class="btn btn--primary" href="{{ about['Link YouTube'] }}" target="_blank" rel="noopener">{{ yt_icon }}{{ about.get('Tombol YouTube ' ~ L) }}</a>{% endif %}
+        {% if about.get('Link Instagram') %}<a class="btn btn--outline" href="{{ about['Link Instagram'] }}" target="_blank" rel="noopener">{{ ig_icon }}{{ about.get('Tombol Instagram ' ~ L) }}</a>{% endif %}
+      </div>
+    </div>
+    <div class="hero__media">
+      <div class="hero__portrait">
+        <img class="motif hero__motif" src="{{ r }}assets/img/motif/mercusuar-navy.svg" alt="" aria-hidden="true" width="240" height="240">
+        <img class="hero__photo" src="{{ r }}{{ about.foto }}" alt="{{ ui.portrait_alt }}" width="300" height="300">
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if freebies %}
+<!-- Freebies -->
+<section class="section bg-mist" id="freebies">
+  <div class="wrap">
+    {{ head('Freebies', 'pelampung-navy') }}
+    <div class="grid">
+      {% for f in freebies %}
+      <article class="card">
+        <div class="card__media">
+          {% if f.cover %}<img src="{{ r }}{{ f.cover }}" alt="{{ f.get('Nama ' ~ L) }}" loading="lazy">{% endif %}
+          <span class="sticker">{{ ui.free }}</span>
+        </div>
+        <div class="card__body">
+          {% if f.get('Format ' ~ L) %}<p class="card__meta">{{ f.get('Format ' ~ L) }}</p>{% endif %}
+          <h3 class="h3">{{ f.get('Nama ' ~ L) }}</h3>
+          <p class="card__text">{{ f.get('Keterangan ' ~ L, '') }}</p>
+          {% if f.get('Link Download') %}<a class="btn btn--primary btn--block" href="{{ f['Link Download'] }}" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>{{ ui.download }}</a>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% for p in products %}
+<!-- {{ p['Nama Produk'] }} -->
+<section class="section bg-{{ p.bg }}" id="{{ p.key }}">
+  <div class="wrap product">
+    <div class="product__text">
+      <p class="eyebrow">{{ wave }}{{ p.get('Judul Section ' ~ L) }}</p>
+      <h2 class="h2">{{ p['Nama Produk'] }}</h2>
+      {% if p.get('Keterangan ' ~ L) %}<p class="tagline">{{ p.get('Keterangan ' ~ L) }}</p>{% endif %}
+      <p class="body">{{ p.get('Paragraf ' ~ L, '') }}</p>
+      {% if not p.get('Segera Hadir') and p.get('Link') and p.get('Tombol ' ~ L) %}
+      <div class="btn-row"><a class="btn btn--primary" href="{{ p['Link'] }}" target="_blank" rel="noopener">{% if 'instagram.com' in p['Link'] %}{{ ig_icon }}{{ p.get('Tombol ' ~ L) }}{% else %}{{ p.get('Tombol ' ~ L) }}{{ arrow }}{% endif %}</a></div>
+      {% endif %}
+      <img class="motif" src="{{ r }}assets/img/motif/{{ p.motif }}.svg" alt="" aria-hidden="true" width="240" height="240" loading="lazy">
+    </div>
+    <div class="product__media">
+      {% set thumb %}{% if p.thumb %}<img src="{{ r }}{{ p.thumb }}" alt="{{ ui.thumb_alt }} {{ p['Nama Produk'] }}" width="1200" height="900" loading="lazy">{% endif %}{% if p.get('Segera Hadir') %}<span class="ribbon">{{ ui.soon }}</span>{% endif %}{% endset %}
+      {% if p.get('Link') and not p.get('Segera Hadir') %}
+      <a class="frame" href="{{ p['Link'] }}" target="_blank" rel="noopener" aria-label="{{ p['Nama Produk'] }}">{{ thumb }}</a>
+      {% else %}
+      <div class="frame">{{ thumb }}</div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endfor %}
+
+{% if portfolio %}
+<!-- Portfolio -->
+<section class="section bg-white" id="portfolio">
+  <div class="wrap">
+    {{ head('Portfolio', 'rute-navy', true) }}
+    <div class="grid">
+      {% for p in portfolio %}
+      <article class="card">
+        <div class="card__media">{% if p.thumb %}<img src="{{ r }}{{ p.thumb }}" alt="{{ ui.thumb_alt }} {{ p['Judul'] }}" loading="lazy">{% endif %}</div>
+        <div class="card__body">
+          <p class="card__meta">{{ p.get('Jenis', '') }}</p>
+          <h3 class="h3">{{ p['Judul'] }}</h3>
+          <p class="card__text">{{ p.get('Keterangan ' ~ L, '') }}</p>
+          {% if p.get('Link') %}<a class="btn btn--primary btn--block" href="{{ p['Link'] }}" target="_blank" rel="noopener">{{ ui.view }}{{ arrow }}</a>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if reps %}
+<!-- Representation -->
+<section class="section bg-mist" id="representation">
+  <div class="wrap">
+    {{ head('Representation', 'ombak-navy') }}
+    <div class="grid grid--reps">
+      {% for p in reps %}
+      {% set tag = 'a' if p.get('Link') else 'article' %}
+      <{{ tag }} class="card card--rep"{% if p.get('Link') %} href="{{ p['Link'] }}" target="_blank" rel="noopener"{% endif %}>
+        <div class="card__media card__media--square">{% if p.foto %}<img src="{{ r }}{{ p.foto }}" alt="{{ p['Nama'] }}" loading="lazy">{% endif %}</div>
+        <div class="card__body">
+          <h3 class="h3">{{ p['Nama'] }}</h3>
+          {% if p.get('Keterangan ' ~ L) %}<p class="card__text">{{ p.get('Keterangan ' ~ L) }}</p>{% endif %}
+        </div>
+      </{{ tag }}>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <img src="{{ r }}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png" alt="{{ site.site_name }}" width="845" height="146" loading="lazy">
+        <p class="footer__tagline">{{ footer.get('Tagline ' ~ L) }}</p>
+      </div>
+      <ul class="footer__links">
+        {% if about.get('Link YouTube') %}<li><a href="{{ about['Link YouTube'] }}" target="_blank" rel="noopener">{{ yt_icon }}YouTube</a></li>{% endif %}
+        {% if about.get('Link Instagram') %}<li><a href="{{ about['Link Instagram'] }}" target="_blank" rel="noopener">{{ ig_icon }}Instagram</a></li>{% endif %}
+      </ul>
+    </div>
+    <p class="footer__copy">{{ footer.get('Hak Cipta') }}</p>
+  </div>
+</footer>
+
+<script src="{{ r }}assets/js/site.js" defer></script>
+</body>
+</html>

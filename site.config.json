@@ -1,0 +1,17 @@
+{
+  "site_name": "Kreasi Digital Hub by Tara x Mattel",
+  "site_url": "https://hi-kreasidigital.github.io/kreasi-digital-hub-taraxmattel/",
+  "airtable_base_id": "appiFXiUuNc4GB1vx",
+  "tables": {
+    "judul_section": "tblDwCQSf55iuLOms",
+    "tentang": "tbliysDmuK965xkWg",
+    "freebies": "tblVf0ldn2TbWJAaU",
+    "usaha": "tblnnJ0I7xyse9BsL",
+    "skill": "tblfpSuJt8ji6iSWe",
+    "seni": "tbloGt4g4lulRQVpG",
+    "ngo": "tblHVIh1P7J96nyHM",
+    "portfolio": "tbl90sF5B46bwdwIh",
+    "representation": "tbllNPiWnL0wjNuYx",
+    "footer": "tblSm9VXA8qLPM5AR"
+  }
+}
