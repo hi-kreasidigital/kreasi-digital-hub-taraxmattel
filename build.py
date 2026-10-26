@@ -162,11 +162,13 @@ def shape(content):
 UI = {
     "id": {"lang_label": "Pilih bahasa", "free": "GRATIS", "download": "Download gratis", "view": "Lihat",
            "soon": "Segera hadir", "portrait_alt": "Potret 3D Tara dan Mattel di dalam cincin kompas",
-           "thumb_alt": "Tampilan", "skip": "Lompat ke konten",
+           "thumb_alt": "Tampilan", "skip": "Lompat ke konten", "prev": "Sebelumnya", "next": "Berikutnya",
+           "zoom_label": "Perbesar gambar", "zoom_hint": "Klik gambar untuk memperbesar", "close": "Tutup",
            "description": "Tara dan Mattel berbagi cerita jujur dan langkah nyata soal mengenal diri, keluarga, pekerjaan, dan uang. Freebies, produk digital, dan karya kami ada di sini."},
     "en": {"lang_label": "Choose language", "free": "FREE", "download": "Free download", "view": "View",
            "soon": "Coming soon", "portrait_alt": "3D portrait of Tara and Mattel inside the compass ring",
-           "thumb_alt": "Preview of", "skip": "Skip to content",
+           "thumb_alt": "Preview of", "skip": "Skip to content", "prev": "Previous", "next": "Next",
+           "zoom_label": "Enlarge image", "zoom_hint": "Click the image to enlarge", "close": "Close",
            "description": "Tara and Mattel share honest stories and real steps about knowing yourself, family, work and money. Our freebies, digital products and work, all in one place."},
 }
 

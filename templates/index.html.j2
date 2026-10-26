@@ -2,6 +2,16 @@
 {% set arrow %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>{% endset %}
 {% set ig_icon %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>{% endset %}
 {% set yt_icon %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg>{% endset %}
+{% macro slider_open(label) %}
+<div class="slider" data-slider>
+  <button class="slider__arrow slider__arrow--prev" type="button" aria-label="{{ ui.prev }}: {{ label }}" data-dir="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+  <div class="slider__track" tabindex="0" role="region" aria-label="{{ label }}">
+{% endmacro %}
+{% macro slider_close() %}
+  </div>
+  <button class="slider__arrow slider__arrow--next" type="button" aria-label="{{ ui.next }}" data-dir="1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+</div>
+{% endmacro %}
 {% macro head(key, motif, rotate=false) %}{% set h = heads.get(key, {}) %}
 <div class="section-head">
   <div class="section-head__text">
@@ -67,10 +77,8 @@
       </div>
     </div>
     <div class="hero__media">
-      <div class="hero__portrait">
-        <img class="motif hero__motif" src="{{ r }}assets/img/motif/mercusuar-navy.svg" alt="" aria-hidden="true" width="240" height="240">
-        <img class="hero__photo" src="{{ r }}{{ about.foto }}" alt="{{ ui.portrait_alt }}" width="300" height="300">
-      </div>
+      <img class="motif hero__motif" src="{{ r }}assets/img/motif/mercusuar-navy.svg" alt="" aria-hidden="true" width="240" height="240">
+      <img class="hero__photo" src="{{ r }}{{ about.foto }}" alt="{{ ui.portrait_alt }}" width="300" height="300">
     </div>
   </div>
 </section>
@@ -80,7 +88,7 @@
 <section class="section bg-mist" id="freebies">
   <div class="wrap">
     {{ head('Freebies', 'pelampung-navy') }}
-    <div class="grid">
+    {{ slider_open('Freebies') }}
       {% for f in freebies %}
       <article class="card">
         <div class="card__media">
@@ -95,7 +103,7 @@
         </div>
       </article>
       {% endfor %}
-    </div>
+    {{ slider_close() }}
   </div>
 </section>
 {% endif %}
@@ -115,11 +123,13 @@
       <img class="motif" src="{{ r }}assets/img/motif/{{ p.motif }}.svg" alt="" aria-hidden="true" width="240" height="240" loading="lazy">
     </div>
     <div class="product__media">
-      {% set thumb %}{% if p.thumb %}<img src="{{ r }}{{ p.thumb }}" alt="{{ ui.thumb_alt }} {{ p['Nama Produk'] }}" width="1200" height="900" loading="lazy">{% endif %}{% if p.get('Segera Hadir') %}<span class="ribbon">{{ ui.soon }}</span>{% endif %}{% endset %}
-      {% if p.get('Link') and not p.get('Segera Hadir') %}
-      <a class="frame" href="{{ p['Link'] }}" target="_blank" rel="noopener" aria-label="{{ p['Nama Produk'] }}">{{ thumb }}</a>
-      {% else %}
-      <div class="frame">{{ thumb }}</div>
+      {% if p.thumb %}
+      <button class="frame frame--zoom" type="button" data-zoom="{{ r }}{{ p.thumb }}" data-alt="{{ ui.thumb_alt }} {{ p['Nama Produk'] }}" aria-label="{{ ui.zoom_label }}: {{ p['Nama Produk'] }}">
+        <img src="{{ r }}{{ p.thumb }}" alt="{{ ui.thumb_alt }} {{ p['Nama Produk'] }}" width="1200" height="900" loading="lazy">
+        {% if p.get('Segera Hadir') %}<span class="ribbon">{{ ui.soon }}</span>{% endif %}
+        <span class="zoom-badge" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg></span>
+      </button>
+      <p class="zoom-hint">{{ ui.zoom_hint }}</p>
       {% endif %}
     </div>
   </div>
@@ -131,7 +141,7 @@
 <section class="section bg-white" id="portfolio">
   <div class="wrap">
     {{ head('Portfolio', 'rute-navy', true) }}
-    <div class="grid">
+    {{ slider_open('Portfolio') }}
       {% for p in portfolio %}
       <article class="card">
         <div class="card__media">{% if p.thumb %}<img src="{{ r }}{{ p.thumb }}" alt="{{ ui.thumb_alt }} {{ p['Judul'] }}" loading="lazy">{% endif %}</div>
@@ -143,7 +153,7 @@
         </div>
       </article>
       {% endfor %}
-    </div>
+    {{ slider_close() }}
   </div>
 </section>
 {% endif %}
@@ -153,7 +163,7 @@
 <section class="section bg-mist" id="representation">
   <div class="wrap">
     {{ head('Representation', 'ombak-navy') }}
-    <div class="grid grid--reps">
+    {{ slider_open('Representation') }}
       {% for p in reps %}
       {% set tag = 'a' if p.get('Link') else 'article' %}
       <{{ tag }} class="card card--rep"{% if p.get('Link') %} href="{{ p['Link'] }}" target="_blank" rel="noopener"{% endif %}>
@@ -164,7 +174,7 @@
         </div>
       </{{ tag }}>
       {% endfor %}
-    </div>
+    {{ slider_close() }}
   </div>
 </section>
 {% endif %}
@@ -186,6 +196,11 @@
     <p class="footer__copy">{{ footer.get('Hak Cipta') }}</p>
   </div>
 </footer>
+
+<dialog class="lightbox" aria-label="{{ ui.zoom_label }}">
+  <button class="lightbox__close" type="button" aria-label="{{ ui.close }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <img class="lightbox__img" src="" alt="">
+</dialog>
 
 <script src="{{ r }}assets/js/site.js" defer></script>
 </body>
