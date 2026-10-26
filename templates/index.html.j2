@@ -120,9 +120,9 @@
       {% if not p.get('Segera Hadir') and p.get('Link') and p.get('Tombol ' ~ L) %}
       <div class="btn-row"><a class="btn btn--primary" href="{{ p['Link'] }}" target="_blank" rel="noopener">{% if 'instagram.com' in p['Link'] %}{{ ig_icon }}{{ p.get('Tombol ' ~ L) }}{% else %}{{ p.get('Tombol ' ~ L) }}{{ arrow }}{% endif %}</a></div>
       {% endif %}
-      <img class="motif" src="{{ r }}assets/img/motif/{{ p.motif }}.svg" alt="" aria-hidden="true" width="240" height="240" loading="lazy">
     </div>
-    <div class="product__media">
+    <div class="product__media product__media--{{ p.spot }}">
+      <img class="motif product__motif" src="{{ r }}assets/img/motif/{{ p.motif }}.svg" alt="" aria-hidden="true" width="240" height="240" loading="lazy">
       {% if p.thumb %}
       <button class="frame frame--zoom" type="button" data-zoom="{{ r }}{{ p.thumb }}" data-alt="{{ ui.thumb_alt }} {{ p['Nama Produk'] }}" aria-label="{{ ui.zoom_label }}: {{ p['Nama Produk'] }}">
         <img src="{{ r }}{{ p.thumb }}" alt="{{ ui.thumb_alt }} {{ p['Nama Produk'] }}" width="1200" height="900" loading="lazy">
