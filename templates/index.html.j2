@@ -122,7 +122,7 @@
       <h2 class="h2">{{ p['Nama Produk'] }}</h2>
       {% if p.get('Keterangan ' ~ L) %}<p class="tagline">{{ p.get('Keterangan ' ~ L) }}</p>{% endif %}
       <p class="body">{{ p.get('Paragraf ' ~ L, '') }}</p>
-      {% if not p.get('Segera Hadir') and p.get('Link') and p.get('Tombol ' ~ L) %}
+      {% if p.get('Link') and p.get('Tombol ' ~ L) %}
       <div class="btn-row"><a class="btn btn--primary" href="{{ p['Link'] }}" target="_blank" rel="noopener">{% if 'instagram.com' in p['Link'] %}{{ ig_icon }}{{ p.get('Tombol ' ~ L) }}{% else %}{{ p.get('Tombol ' ~ L) }}{{ arrow }}{% endif %}</a></div>
       {% endif %}
     </div>

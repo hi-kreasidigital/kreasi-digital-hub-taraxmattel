@@ -33,7 +33,7 @@ Setiap section punya tabel sendiri. Kolom berakhiran **ID** untuk versi Indonesi
 | 0 · Judul Section | Label, judul, dan pengantar untuk Freebies, Portfolio, Representation |
 | 1 · Tentang Tara x Mattel | Paragraf hero, foto, link YouTube & Instagram |
 | 2 · Freebies | Kartu freebie. Centang **Tampilkan** agar muncul |
-| 3–6 · Untuk … | Section produk (Usaha, Skill, Seniman Visual, Yayasan & NGO). Centang **Segera Hadir** untuk pita merah tanpa tombol |
+| 3–6 · Untuk … | Section produk (Usaha, Skill, Seniman Visual, Yayasan & NGO). Centang **Segera Hadir** untuk pita merah. Tombol muncul bila **Tombol** dan **Link** diisi |
 | 7 · Portfolio | Kartu portfolio |
 | 8 · Representation | Kartu representation |
 | 9 · Footer | Tagline dan hak cipta |
