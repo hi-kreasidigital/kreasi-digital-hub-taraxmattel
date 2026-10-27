@@ -49,7 +49,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Lora:ital,wght@1,500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="{{ r }}assets/css/site.css">
+<link rel="stylesheet" href="{{ r }}assets/css/site.css?v={{ ver }}">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"{{ site.site_name }}","url":"{{ site_url }}","logo":"{{ site_url }}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png","sameAs":["{{ about.get('Link YouTube','') }}","{{ about.get('Link Instagram','') }}"]}</script>
 </head>
 <body>
@@ -222,6 +222,6 @@
   <img class="lightbox__img" src="" alt="">
 </dialog>
 
-<script src="{{ r }}assets/js/site.js" defer></script>
+<script src="{{ r }}assets/js/site.js?v={{ ver }}" defer></script>
 </body>
 </html>

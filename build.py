@@ -181,13 +181,16 @@ def main():
     shutil.copytree(os.path.join(ROOT, "assets"), os.path.join(DIST, "assets"))
 
     data = shape(content)
+    # cache busting: a new version string whenever the CSS or JS changes
+    ver = hashlib.sha1(b"".join(open(os.path.join(ROOT, "assets", f), "rb").read()
+                                for f in ("css/site.css", "js/site.js"))).hexdigest()[:10]
     env = Environment(loader=FileSystemLoader(os.path.join(ROOT, "templates")),
                       autoescape=select_autoescape(["html", "j2"]), trim_blocks=True, lstrip_blocks=True)
     tpl = env.get_template("index.html.j2")
     site_url = CONFIG["site_url"].rstrip("/") + "/"
     for lang, prefix, out in (("id", "", "index.html"), ("en", "../", "en/index.html")):
         L = lang.upper()
-        html = tpl.render(lang=lang, L=L, r=prefix, ui=UI[lang], site=CONFIG, site_url=site_url,
+        html = tpl.render(lang=lang, L=L, r=prefix, ui=UI[lang], ver=ver, site=CONFIG, site_url=site_url,
                           built=datetime.now(timezone.utc).isoformat(timespec="minutes"), **data)
         path = os.path.join(DIST, out)
         os.makedirs(os.path.dirname(path), exist_ok=True)
