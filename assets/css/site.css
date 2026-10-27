@@ -13,7 +13,6 @@
   --wrap: 1200px;
   --gutter: clamp(20px, 5vw, 64px);
   --space: clamp(40px, 4.6vw, 68px);
-  --motif: clamp(96px, 17vw, 240px);
   --head: "Plus Jakarta Sans", Montserrat, system-ui, sans-serif;
   --body: "DM Sans", Inter, system-ui, -apple-system, sans-serif;
   --quote: Lora, Georgia, serif;
@@ -76,32 +75,34 @@ a:focus-visible, .btn:focus-visible { outline: 2px solid var(--ocean); outline-o
   .lang__opt { height: 26px; font-size: 12px; }
 }
 
-/* ---------- motifs: part of the layout, never over content */
-.motif { width: var(--motif); height: auto; opacity: 0.3; flex: none; }
-.motif--turn { transform: rotate(90deg); }
+/* ---------- motifs: faint background decoration at the section edges, behind content */
+.section { position: relative; overflow: hidden; }
+.section > .wrap { position: relative; z-index: 1; }
+.deco { position: absolute; z-index: 0; height: auto; pointer-events: none; user-select: none; opacity: 0.1; }
+.bg-ocean .deco, .bg-navy .deco { opacity: 0.2; }
+.deco--tr { width: clamp(180px, 19vw, 280px); top: clamp(16px, 3vw, 48px); right: clamp(-30px, calc((100% - 1200px) / 2 - 170px), 160px); }
+.deco--bl { width: clamp(110px, 11vw, 170px); bottom: clamp(16px, 4vw, 64px); left: -34px; }
+@media (max-width: 640px) { .deco { display: none; } }
 
 /* ---------- hero */
 .hero { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(24px, 3vw, 40px); }
 .hero__text { flex: 1 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
 .hero__lead { margin: 0; max-width: 600px; font-size: clamp(16px, 1.2vw, 18px); line-height: 1.7; white-space: pre-line; }
-.hero__media { flex: 0 1 620px; min-width: 0; display: flex; align-items: flex-end; justify-content: center; gap: clamp(8px, 2vw, 24px); }
-.hero__motif { width: clamp(130px, 18vw, 270px); margin-bottom: -6px; }
+.hero__media { flex: 0 1 340px; min-width: 0; display: flex; justify-content: center; }
 .hero__photo { width: clamp(200px, 20vw, 290px); height: auto; aspect-ratio: 1; border-radius: 50%; flex: none; }
 @media (max-width: 640px) {
   /* phone: photo top left, buttons beside it, then the text */
   .hero { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 16px; row-gap: 18px; }
   .hero__text, .hero__media { display: contents; }
-  .hero__motif { display: none; }
   .hero__photo { grid-column: 1; grid-row: 1; width: 132px; }
   .hero .btn-row { grid-column: 2; grid-row: 1; flex-direction: column; gap: 10px; padding-top: 0; }
   .hero .btn { min-height: 42px; padding: 8px 12px; font-size: 14px; gap: 8px; line-height: 1.25; text-align: left; justify-content: flex-start; }
   .hero .btn svg { flex: none; }
   .hero .eyebrow { grid-column: 1 / -1; grid-row: 2; }
   .hero__lead { grid-column: 1 / -1; grid-row: 3; margin-top: -6px; }
-  .section-head > .motif { display: none; }
 }
 
-/* ---------- section heads with motif */
+/* ---------- section heads */
 .section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
 .section-head__text { flex: 1 1 480px; min-width: 0; max-width: 720px; display: flex; flex-direction: column; gap: 14px; }
 
@@ -141,25 +142,16 @@ a.card:hover .h3 { color: var(--ocean); }
 .card__text--clamp { display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; flex: 0 1 auto; }
 .card__more { margin-top: auto; padding-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-family: var(--head); font-weight: 700; font-size: 15px; color: var(--ocean); }
 
-/* ---------- product sections */
-.product { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(24px, 3vw, 48px); }
-.product__text { flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-.product__media { flex: 1 1 560px; min-width: 0; max-width: 700px; display: grid; align-items: start; column-gap: clamp(8px, 1.5vw, 20px); }
-/* bl: motif in the gap left of the thumbnail, low; tr: motif past the thumbnail's top right corner */
-.product__media--bl { grid-template-columns: auto minmax(0, 1fr); }
-.product__media--bl .product__motif { grid-column: 1; grid-row: 1 / span 2; align-self: end; }
-.product__media--bl > :not(.product__motif) { grid-column: 2; }
-.product__media--tr { grid-template-columns: minmax(0, 1fr) auto; }
-.product__media--tr .product__motif { grid-column: 2; grid-row: 1; align-self: start; margin-top: calc(var(--motif) * -0.3); }
-.product__media--tr > :not(.product__motif) { grid-column: 1; }
-.product__motif { width: calc(var(--motif) * 0.8); }
+/* ---------- product sections: text left, thumbnail right */
+.product { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(32px, 5vw, 72px); }
+.product__text { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; text-align: left; }
+.product__media { min-width: 0; }
+@media (max-width: 900px) { .product { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) {
   /* phone: left aligned, text, then thumbnail, then button */
-  .product { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 14px; }
+  .product { display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
   .product__text { display: contents; }
-  .product__media { order: 1; max-width: none; flex: none; width: 100%; grid-template-columns: minmax(0, 1fr); margin-top: 6px; }
-  .product__media > :not(.product__motif) { grid-column: 1; }
-  .product__motif { display: none; }
+  .product__media { order: 1; margin-top: 6px; }
   .product .btn-row { order: 2; padding-top: 0; }
 }
 .frame { position: relative; display: block; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--line); background: var(--white); }

@@ -12,14 +12,17 @@
   <button class="slider__arrow slider__arrow--next" type="button" aria-label="{{ ui.next }}" data-dir="1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 </div>
 {% endmacro %}
-{% macro head(key, motif, rotate=false) %}{% set h = heads.get(key, {}) %}
+{% macro deco(tr=None, bl=None) %}
+{% if tr %}<img class="deco deco--tr" src="{{ r }}assets/img/motif/{{ tr }}.svg" alt="" aria-hidden="true" width="96" height="96" loading="lazy">{% endif %}
+{% if bl %}<img class="deco deco--bl" src="{{ r }}assets/img/motif/{{ bl }}.svg" alt="" aria-hidden="true" width="96" height="96" loading="lazy">{% endif %}
+{% endmacro %}
+{% macro head(key) %}{% set h = heads.get(key, {}) %}
 <div class="section-head">
   <div class="section-head__text">
     <p class="eyebrow">{{ wave }}{{ h.get('Label ' ~ L) or key }}</p>
     <h2 class="h2">{{ h.get('Judul ' ~ L) or key }}</h2>
     {% if h.get('Pengantar ' ~ L) %}<p class="lead">{{ h.get('Pengantar ' ~ L) }}</p>{% endif %}
   </div>
-  <img class="motif{% if rotate %} motif--turn{% endif %}" src="{{ r }}assets/img/motif/{{ motif }}.svg" alt="" aria-hidden="true" width="240" height="240" loading="lazy">
 </div>
 {% endmacro %}
 <!doctype html>
@@ -67,6 +70,7 @@
 
 <!-- Tentang -->
 <section class="section bg-white" id="tentang">
+  {{ deco('mercusuar-navy', 'ombak-navy') }}
   <div class="wrap hero">
     <div class="hero__text">
       <p class="eyebrow">{{ wave }}{{ about.get('Judul Section ' ~ L) }}</p>
@@ -77,7 +81,6 @@
       </div>
     </div>
     <div class="hero__media">
-      <img class="motif hero__motif" src="{{ r }}assets/img/motif/mercusuar-navy.svg" alt="" aria-hidden="true" width="240" height="240">
       <img class="hero__photo" src="{{ r }}{{ about.foto }}" alt="{{ ui.portrait_alt }}" width="300" height="300">
     </div>
   </div>
@@ -86,8 +89,9 @@
 {% if freebies %}
 <!-- Freebies -->
 <section class="section bg-mist" id="freebies">
+  {{ deco('pelampung-navy') }}
   <div class="wrap">
-    {{ head('Freebies', 'pelampung-navy') }}
+    {{ head('Freebies') }}
     {{ slider_open('Freebies') }}
       {% for f in freebies %}
       <article class="card">
@@ -111,6 +115,7 @@
 {% for p in products %}
 <!-- {{ p['Nama Produk'] }} -->
 <section class="section bg-{{ p.bg }}" id="{{ p.key }}">
+  {{ deco(p.deco_tr, p.deco_bl) }}
   <div class="wrap product">
     <div class="product__text">
       <p class="eyebrow">{{ wave }}{{ p.get('Judul Section ' ~ L) }}</p>
@@ -121,8 +126,7 @@
       <div class="btn-row"><a class="btn btn--primary" href="{{ p['Link'] }}" target="_blank" rel="noopener">{% if 'instagram.com' in p['Link'] %}{{ ig_icon }}{{ p.get('Tombol ' ~ L) }}{% else %}{{ p.get('Tombol ' ~ L) }}{{ arrow }}{% endif %}</a></div>
       {% endif %}
     </div>
-    <div class="product__media product__media--{{ p.spot }}">
-      <img class="motif product__motif" src="{{ r }}assets/img/motif/{{ p.motif }}.svg" alt="" aria-hidden="true" width="240" height="240" loading="lazy">
+    <div class="product__media">
       {% if p.thumb %}
       <button class="frame frame--zoom" type="button" data-zoom="{{ r }}{{ p.thumb }}" data-alt="{{ ui.thumb_alt }} {{ p['Nama Produk'] }}" aria-label="{{ ui.zoom_label }}: {{ p['Nama Produk'] }}">
         <img src="{{ r }}{{ p.thumb }}" alt="{{ ui.thumb_alt }} {{ p['Nama Produk'] }}" width="1200" height="900" loading="lazy">
@@ -139,8 +143,9 @@
 {% if portfolio %}
 <!-- Portfolio -->
 <section class="section bg-white" id="portfolio">
+  {{ deco('rute-navy') }}
   <div class="wrap">
-    {{ head('Portfolio', 'rute-navy', true) }}
+    {{ head('Portfolio') }}
     {{ slider_open('Portfolio') }}
       {% for p in portfolio %}
       <article class="card">
@@ -161,8 +166,9 @@
 {% if reps %}
 <!-- Representation -->
 <section class="section bg-mist" id="representation">
+  {{ deco('pelampung-navy', 'ombak-navy') }}
   <div class="wrap">
-    {{ head('Representation', 'ombak-navy') }}
+    {{ head('Representation') }}
     {{ slider_open('Representation') }}
       {% for p in reps %}
       {% set link = p.get('Link', '') if (p.get('Link', '') or '').startswith('http') else '' %}

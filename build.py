@@ -113,11 +113,11 @@ def visible(rows):
 
 
 PRODUCTS = [
-    # key, motif, background, motif spot around the thumbnail (bl = bottom left, tr = top right)
-    ("usaha", "kompas-white", "ocean", "bl"),
-    ("skill", "kemudi-navy", "mist", "bl"),
-    ("seni", "jangkar-white", "navy", "tr"),
-    ("ngo", "mercusuar-navy", "mist", "tr"),
+    # key, background, decorative motifs (top right, bottom left)
+    ("usaha", "ocean", "kompas-white", "ombak-white"),
+    ("skill", "mist", "kemudi-navy", None),
+    ("seni", "navy", "jangkar-white", "ombak-white"),
+    ("ngo", "mist", "mercusuar-navy", None),
 ]
 
 
@@ -131,11 +131,11 @@ def shape(content):
         r["cover"] = pick_image(r, "Cover", "freebie", 900)
 
     products = []
-    for key, motif, bg, spot in PRODUCTS:
+    for key, bg, tr, bl in PRODUCTS:
         r = first(content.get(key, []))
         if not r or not r.get("Tampilkan"):
             continue
-        r["key"], r["motif"], r["bg"], r["spot"] = key, motif, bg, spot
+        r["key"], r["bg"], r["deco_tr"], r["deco_bl"] = key, bg, tr, bl
         r["thumb"] = pick_image(r, "Thumbnail", key, 1200, f"img/default/{slug(r.get('Nama Produk'))}.webp")
         products.append(r)
 
