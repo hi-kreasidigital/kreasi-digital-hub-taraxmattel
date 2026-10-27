@@ -165,12 +165,26 @@
     {{ head('Representation', 'ombak-navy') }}
     {{ slider_open('Representation') }}
       {% for p in reps %}
-      {% set tag = 'a' if p.get('Link') else 'article' %}
-      <{{ tag }} class="card card--rep"{% if p.get('Link') %} href="{{ p['Link'] }}" target="_blank" rel="noopener"{% endif %}>
-        <div class="card__media card__media--square">{% if p.foto %}<img src="{{ r }}{{ p.foto }}" alt="{{ p['Nama'] }}" loading="lazy">{% endif %}</div>
+      {% set link = p.get('Link', '') if (p.get('Link', '') or '').startswith('http') else '' %}
+      {% set nama = (p.get('Nama') or '') | replace('\n', ' ') %}
+      {% set parts = nama.split('|') %}
+      {% set judul = parts[0] | trim %}
+      {% set sumber = (parts[1:] | join('|')) | trim %}
+      {% set tag = 'a' if link else 'article' %}
+      <{{ tag }} class="card card--rep"{% if link %} href="{{ link }}" target="_blank" rel="noopener"{% endif %}>
+        {% if p.foto %}
+        <div class="card__media card__media--square"><img src="{{ r }}{{ p.foto }}" alt="{{ nama }}" loading="lazy"></div>
+        {% else %}
+        <div class="card__media rep-cover" aria-hidden="true">
+          {% if 'instagram.com' in link %}<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>{% else %}<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>{% endif %}
+          <span class="rep-cover__name">{{ sumber or judul }}</span>
+        </div>
+        {% endif %}
         <div class="card__body">
-          <h3 class="h3">{{ p['Nama'] }}</h3>
-          {% if p.get('Keterangan ' ~ L) %}<p class="card__text">{{ p.get('Keterangan ' ~ L) }}</p>{% endif %}
+          {% if sumber and p.foto %}<p class="card__meta">{{ sumber }}</p>{% endif %}
+          <h3 class="h3">{{ judul }}</h3>
+          {% if p.get('Keterangan ' ~ L) %}<p class="card__text card__text--clamp">{{ p.get('Keterangan ' ~ L) }}</p>{% endif %}
+          {% if link %}<span class="card__more">{{ ui.view }}{{ arrow }}</span>{% endif %}
         </div>
       </{{ tag }}>
       {% endfor %}
