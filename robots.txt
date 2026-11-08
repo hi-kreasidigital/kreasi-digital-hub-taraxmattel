@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hi-kreasidigital.github.io/kreasi-digital-hub-taraxmattel/sitemap.xml
