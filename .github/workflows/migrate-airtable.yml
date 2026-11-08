@@ -1,0 +1,51 @@
+name: Copy Airtable data into Supabase
+
+# One-time copy of the Airtable CMS into the Supabase CMS (Airtable itself is only read).
+# Runs when supabase/import-trigger.txt changes, or manually from the Actions tab.
+# Uses the existing AIRTABLE_TOKEN secret. After the switch to Supabase the import
+# function refuses to run (sites.import_locked = true), so admin edits are never
+# overwritten. Delete this workflow and the AIRTABLE_TOKEN secret after cutover.
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - supabase/import-trigger.txt
+
+permissions:
+  contents: write   # only used to push the parity-baseline branch
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install "Pillow>=10,<13"
+      - name: Import Airtable -> Supabase
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+        run: python scripts/airtable_import.py
+
+  # The old Python/Airtable site, built once more from the same Airtable data, so the
+  # new Astro build can be compared with it (pushed to the parity-baseline branch).
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, path: old }
+      - name: Build the old site
+        id: old
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+        run: |
+          if [ ! -f old/build.py ]; then echo "main no longer has build.py, nothing to compare"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          pip install -r old/requirements.txt
+          cd old && python build.py
+      - name: Push to parity-baseline
+        if: steps.old.outputs.skip != 'true'
+        run: |
+          cd old/dist
+          git init -q -b parity-baseline && git add -A
+          git -c user.name=preview-bot -c user.email=actions@users.noreply.github.com commit -qm "Old site build for parity check [skip ci]"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" parity-baseline
