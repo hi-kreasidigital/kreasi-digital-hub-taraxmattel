@@ -21,7 +21,7 @@ dibangun oleh **GitHub Actions** (Astro) dan tayang di GitHub Pages, lalu di
 4. Klik **Terbitkan perubahan**. Situs diperbarui dalam beberapa menit.
 
 Section Freebies dan Representation disembunyikan otomatis kalau belum ada baris yang published.
-Pesan dari formulir kontak (tombol **Hubungi kami**) masuk ke dashboard admin dan dikirim ke email.
+Pesan dari formulir kontak (tombol **Hubungi kami**) masuk ke dashboard admin dan dikirim ke taraxmattel@gmail.com.
 Situs ini sengaja **tidak diindeks Google** (noindex); jumlah pengunjung dilihat di Cloudflare Web Analytics.
 Gambar yang dikosongkan memakai gambar bawaan di `public/assets/img/default/`.
 

@@ -18,7 +18,7 @@ Contact form ──► Edge Function submit-form (origin check, honeypot, Turnst
 
 **Not in search engines, on purpose.** Every page has `<meta name="robots" content="noindex,nofollow">`, Cloudflare Pages also sends `X-Robots-Tag: noindex, nofollow` for every file (`public/_headers`), there is no sitemap, and `robots.txt` still lets crawlers in so they can read that instruction (blocking them would hide it). Visitor numbers come from Cloudflare Web Analytics, which doesn't depend on Google.
 
-**Contact form** (section `#kontak`, opened by the "Hubungi kami" button in the header): name, business type, email, WhatsApp (optional) and message. It posts to `submit-form` with `form: "kontak"`; entries appear in the admin under the form entries menu and are emailed to `sites.notify_email` (Reply-To = the visitor). The Turnstile widget is on the form (site key default in `src/lib/config.ts`). Styles and script are in the separate files `public/assets/css/contact.css` and `public/assets/js/contact.js`, so the original `site.css` / `site.js` stay untouched.
+**Contact form** (section `#kontak`, opened by the "Hubungi kami" button in the header): name, business type, email, WhatsApp (optional) and message. It posts to `submit-form` with `form: "kontak"`; entries appear in the admin under the form entries menu and are emailed to `sites.notify_email`, set to **taraxmattel@gmail.com** (Reply-To = the visitor; change it in admin → Pengaturan situs). The Turnstile widget is on the form (site key default in `src/lib/config.ts`). Styles and script are in the separate files `public/assets/css/contact.css` and `public/assets/js/contact.js`, so the original `site.css` / `site.js` stay untouched.
 
 ## Where things live
 
