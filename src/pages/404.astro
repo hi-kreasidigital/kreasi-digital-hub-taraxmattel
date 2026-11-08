@@ -1,0 +1,44 @@
+---
+// Not-found page (both languages on one page). Uses the site CSS so it looks like the rest.
+import { T } from '../lib/data';
+import { BASE_PATH } from '../lib/config';
+const home = `${BASE_PATH}/`;
+---
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<title>{T('notFound.title', 'id')} · {T('meta.title', 'id')}</title>
+<link rel="icon" type="image/png" href={`${BASE_PATH}/assets/img/favicon.png`}>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Lora:ital,wght@1,500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+<link rel="stylesheet" href={`${BASE_PATH}/assets/css/site.css`}>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__logo" href={home}><img src={`${BASE_PATH}/assets/img/logo-kreasi-digital-hub-tara-x-mattel.png`} alt={T('meta.title', 'id')} width="845" height="146"></a>
+  </div>
+</header>
+<main>
+  <section class="section bg-white">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-head__text">
+          <h1 class="h2">{T('notFound.title', 'id')}</h1>
+          <p class="lead">{T('notFound.lead', 'id')}</p>
+          <p class="lead" lang="en">{T('notFound.lead', 'en')}</p>
+        </div>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn--primary" href={home}>{T('notFound.cta', 'id')}</a>
+        <a class="btn btn--outline" href={`${home}en/`} lang="en">{T('notFound.cta', 'en')}</a>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

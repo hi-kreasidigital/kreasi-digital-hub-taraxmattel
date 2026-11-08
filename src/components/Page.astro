@@ -1,0 +1,349 @@
+---
+// The one-page site, ported 1:1 from the old templates/index.html.j2 (same markup, same CSS/JS).
+// Text comes from Supabase (src/lib/data.ts); only links stay relative like before ("" or "../").
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { about, freebies, L, portfolio, products, reps, S, T, type Lang } from '../lib/data';
+import { CF_ANALYTICS_TOKEN, FORM_ENDPOINT, GOOGLE_SITE_VERIFICATION, SITE_BASE_URL, SITE_ID, TURNSTILE_SITE_KEY } from '../lib/config';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const r = lang === 'en' ? '../' : '';
+const home = r ? r : './';
+const t = (k: string) => T(k, lang);
+const siteName = t('meta.title');
+const description = t('meta.description');
+const siteUrl = `${SITE_BASE_URL}/`;
+const pageUrl = `${siteUrl}${lang === 'en' ? 'en/' : ''}`;
+// relative asset path, or a full URL (photos stored in Supabase) as it is
+const src = (p: string) => (/^https?:\/\//.test(p) ? p : `${r}${p}`);
+
+// cache busting: a new version string whenever the CSS or JS changes (same recipe as build.py)
+const ver = createHash('sha1')
+  .update(Buffer.concat(['css/site.css', 'js/site.js', 'css/contact.css', 'js/contact.js'].map((f) => readFileSync(new URL(`../../public/assets/${f}`, import.meta.url)))))
+  .digest('hex').slice(0, 10);
+
+const wave = '<svg class="eyebrow-icon" width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M1 4 Q4 1 7 4 T13 4 T19 4 T25 4"/><path d="M1 9 Q4 6 7 9 T13 9 T19 9 T25 9"/><path d="M1 14 Q4 11 7 14 T13 14 T19 14 T25 14"/></svg>';
+const arrow = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>';
+const igIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>';
+const ytIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg>';
+const prevIcon = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
+const nextIcon = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+const downloadIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>';
+const zoomIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>';
+const repIgIcon = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>';
+const repStarIcon = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>';
+const closeIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+/** section heading for the card sections; label/title fall back to the section name, like before */
+const head = (key: string, name: string) => ({
+  label: S(`${key}.label`, lang) || name,
+  title: S(`${key}.title`, lang) || name,
+  lead: S(`${key}.lead`, lang),
+});
+const youtube = about.link || '';
+const instagram = about.link2 || '';
+const org = { '@context': 'https://schema.org', '@type': 'Organization', name: siteName, url: siteUrl,
+  logo: `${siteUrl}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png`, sameAs: [youtube, instagram].filter(Boolean) };
+
+// Contact form (posts to the shared submit-form Edge Function; entries show up in the admin and by email)
+const lines = (k: string) => t(k).split('\n').map((x) => x.trim()).filter(Boolean);
+const contactCfg = JSON.stringify({
+  url: FORM_ENDPOINT, site: SITE_ID, lang, source: lang === 'en' ? 'Kontak (EN)' : 'Kontak',
+  sending: t('contact.sending'), ok: t('contact.ok'), err: t('contact.err'), invalid: t('contact.invalid'),
+  business: t('contact.business'),
+});
+const mailIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>';
+const checkIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+
+const repCards = reps.map((p) => {
+  const link = (p.link || '').startsWith('http') ? p.link : '';
+  const nama = String(p.name || '').replace(/\n/g, ' ');
+  const parts = nama.split('|');
+  return { p, link, nama, judul: parts[0].trim(), sumber: parts.slice(1).join('|').trim(), Tag: link ? 'a' : 'article' };
+});
+---
+<!doctype html>
+<html lang={lang}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{siteName}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={pageUrl}>
+<link rel="alternate" hreflang="id" href={siteUrl}>
+<link rel="alternate" hreflang="en" href={`${siteUrl}en/`}>
+<link rel="alternate" hreflang="x-default" href={siteUrl}>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content={siteName}>
+<meta property="og:title" content={siteName}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={pageUrl}>
+<meta property="og:image" content={`${siteUrl}assets/img/og-image.jpg`}>
+<meta property="og:locale" content={lang === 'id' ? 'id_ID' : 'en_US'}>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content={siteName}>
+<meta name="twitter:description" content={description}>
+<meta name="twitter:image" content={`${siteUrl}assets/img/og-image.jpg`}>
+<meta name="theme-color" content="#0F2A4A">
+<meta name="robots" content="noindex,nofollow">
+{GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION}>}
+<link rel="icon" type="image/png" href={`${r}assets/img/favicon.png`}>
+<link rel="apple-touch-icon" href={`${r}assets/img/apple-touch-icon.png`}>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Lora:ital,wght@1,500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+<link rel="stylesheet" href={`${r}assets/css/site.css?v=${ver}`}>
+<link rel="stylesheet" href={`${r}assets/css/contact.css?v=${ver}`}>
+<script type="application/ld+json" set:html={JSON.stringify(org)} />
+</head>
+<body>
+<a class="skip" href="#konten">{t('ui.skip')}</a>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a class="topbar__logo" href={home}><img src={`${r}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png`} alt={siteName} width="845" height="146"></a>
+    <div class="topbar__actions">
+      <a class="btn btn--primary topbar__cta" href="#kontak" aria-label={t('contact.cta')}><Fragment set:html={mailIcon} /><span>{t('contact.cta')}</span></a>
+      <div class="lang" role="group" aria-label={t('ui.lang_label')} data-lang={lang}>
+        <span class="lang__pill" aria-hidden="true"></span>
+        <a class="lang__opt" href={home} hreflang="id" lang="id" aria-current={lang === 'id' ? 'true' : undefined}>ID</a>
+        <a class="lang__opt" href={`${r}en/`} hreflang="en" lang="en" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="konten">
+
+<!-- Tentang -->
+<section class="section bg-white" id="tentang">
+  <img class="deco deco--tr" src={`${r}assets/img/motif/mercusuar-navy.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">
+  <img class="deco deco--bl" src={`${r}assets/img/motif/ombak-navy.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">
+  <div class="wrap hero">
+    <div class="hero__text">
+      <p class="eyebrow"><Fragment set:html={wave} />{L(about, 'label', lang)}</p>
+      <p class="hero__lead">{L(about, 'body', lang)}</p>
+      <div class="btn-row">
+        {youtube && <a class="btn btn--primary" href={youtube} target="_blank" rel="noopener"><Fragment set:html={ytIcon} />{L(about, 'button', lang)}</a>}
+        {instagram && <a class="btn btn--outline" href={instagram} target="_blank" rel="noopener"><Fragment set:html={igIcon} />{L(about, 'button2', lang)}</a>}
+      </div>
+    </div>
+    <div class="hero__media">
+      <img class="hero__photo" src={src(about.foto)} alt={t('ui.portrait_alt')} width="300" height="300">
+    </div>
+  </div>
+</section>
+
+{freebies.length > 0 && (() => { const h = head('freebies', 'Freebies'); return (
+<Fragment>
+<Fragment set:html={"<!-- Freebies -->"} />
+<section class="section bg-mist" id="freebies">
+  <img class="deco deco--tr" src={`${r}assets/img/motif/pelampung-navy.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-head__text">
+        <p class="eyebrow"><Fragment set:html={wave} />{h.label}</p>
+        <h2 class="h2">{h.title}</h2>
+        {h.lead && <p class="lead">{h.lead}</p>}
+      </div>
+    </div>
+    <div class="slider" data-slider>
+      <button class="slider__arrow slider__arrow--prev" type="button" aria-label={`${t('ui.prev')}: Freebies`} data-dir="-1"><Fragment set:html={prevIcon} /></button>
+      <div class="slider__track" tabindex="0" role="region" aria-label="Freebies">
+        {freebies.map((f) => (
+        <article class="card">
+          <div class="card__media">
+            {f.cover && <img src={src(f.cover)} alt={L(f, 'name', lang)} loading="lazy">}
+            <span class="sticker">{t('ui.free')}</span>
+          </div>
+          <div class="card__body">
+            {L(f, 'format', lang) && <p class="card__meta">{L(f, 'format', lang)}</p>}
+            <h3 class="h3">{L(f, 'name', lang)}</h3>
+            <p class="card__text">{L(f, 'description', lang)}</p>
+            {f.download_url && <a class="btn btn--primary btn--block" href={f.download_url} target="_blank" rel="noopener"><Fragment set:html={downloadIcon} />{t('ui.download')}</a>}
+          </div>
+        </article>
+        ))}
+      </div>
+      <button class="slider__arrow slider__arrow--next" type="button" aria-label={t('ui.next')} data-dir="1"><Fragment set:html={nextIcon} /></button>
+    </div>
+  </div>
+</section>
+</Fragment>); })()}
+
+{products.map((p) => (
+<Fragment>
+<Fragment set:html={`<!-- ${String(p.name ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/--/g, '- -')} -->`} />
+<section class={`section bg-${p.bg}`} id={p.key}>
+  {p.deco_tr && <img class="deco deco--tr" src={`${r}assets/img/motif/${p.deco_tr}.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">}
+  {p.deco_bl && <img class="deco deco--bl" src={`${r}assets/img/motif/${p.deco_bl}.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">}
+  <div class="wrap product">
+    <div class="product__text">
+      <p class="eyebrow"><Fragment set:html={wave} />{L(p, 'label', lang)}</p>
+      <h2 class="h2">{p.name}</h2>
+      {L(p, 'tagline', lang) && <p class="tagline">{L(p, 'tagline', lang)}</p>}
+      <p class="body">{L(p, 'body', lang)}</p>
+      {p.link && L(p, 'button', lang) && (
+      <div class="btn-row"><a class="btn btn--primary" href={p.link} target="_blank" rel="noopener">{p.link.includes('instagram.com')
+        ? <Fragment><Fragment set:html={igIcon} />{L(p, 'button', lang)}</Fragment>
+        : <Fragment>{L(p, 'button', lang)}<Fragment set:html={arrow} /></Fragment>}</a></div>
+      )}
+    </div>
+    <div class="product__media">
+      {p.thumb && (
+      <Fragment>
+      <button class="frame frame--zoom" type="button" data-zoom={src(p.thumb)} data-alt={`${t('ui.thumb_alt')} ${p.name}`} aria-label={`${t('ui.zoom_label')}: ${p.name}`}>
+        <img src={src(p.thumb)} alt={`${t('ui.thumb_alt')} ${p.name}`} width="1200" height="900" loading="lazy">
+        {p.coming_soon && <span class="ribbon">{t('ui.soon')}</span>}
+        <span class="zoom-badge" aria-hidden="true"><Fragment set:html={zoomIcon} /></span>
+      </button>
+      <p class="zoom-hint">{t('ui.zoom_hint')}</p>
+      </Fragment>
+      )}
+    </div>
+  </div>
+</section>
+</Fragment>
+))}
+
+{portfolio.length > 0 && (() => { const h = head('portfolio', 'Portfolio'); return (
+<Fragment>
+<Fragment set:html={"<!-- Portfolio -->"} />
+<section class="section bg-white" id="portfolio">
+  <img class="deco deco--tr" src={`${r}assets/img/motif/rute-navy.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-head__text">
+        <p class="eyebrow"><Fragment set:html={wave} />{h.label}</p>
+        <h2 class="h2">{h.title}</h2>
+        {h.lead && <p class="lead">{h.lead}</p>}
+      </div>
+    </div>
+    <div class="slider" data-slider>
+      <button class="slider__arrow slider__arrow--prev" type="button" aria-label={`${t('ui.prev')}: Portfolio`} data-dir="-1"><Fragment set:html={prevIcon} /></button>
+      <div class="slider__track" tabindex="0" role="region" aria-label="Portfolio">
+        {portfolio.map((p) => (
+        <article class="card">
+          <div class="card__media">{p.thumb && <img src={src(p.thumb)} alt={`${t('ui.thumb_alt')} ${p.title}`} loading="lazy">}</div>
+          <div class="card__body">
+            <p class="card__meta">{p.kind || ''}</p>
+            <h3 class="h3">{p.title}</h3>
+            <p class="card__text">{L(p, 'description', lang)}</p>
+            {p.link && <a class="btn btn--primary btn--block" href={p.link} target="_blank" rel="noopener">{t('ui.view')}<Fragment set:html={arrow} /></a>}
+          </div>
+        </article>
+        ))}
+      </div>
+      <button class="slider__arrow slider__arrow--next" type="button" aria-label={t('ui.next')} data-dir="1"><Fragment set:html={nextIcon} /></button>
+    </div>
+  </div>
+</section>
+</Fragment>); })()}
+
+{repCards.length > 0 && (() => { const h = head('representation', 'Representation'); return (
+<Fragment>
+<Fragment set:html={"<!-- Representation -->"} />
+<section class="section bg-mist" id="representation">
+  <img class="deco deco--tr" src={`${r}assets/img/motif/pelampung-navy.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">
+  <img class="deco deco--bl" src={`${r}assets/img/motif/ombak-navy.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-head__text">
+        <p class="eyebrow"><Fragment set:html={wave} />{h.label}</p>
+        <h2 class="h2">{h.title}</h2>
+        {h.lead && <p class="lead">{h.lead}</p>}
+      </div>
+    </div>
+    <div class="slider" data-slider>
+      <button class="slider__arrow slider__arrow--prev" type="button" aria-label={`${t('ui.prev')}: Representation`} data-dir="-1"><Fragment set:html={prevIcon} /></button>
+      <div class="slider__track" tabindex="0" role="region" aria-label="Representation">
+        {repCards.map(({ p, link, nama, judul, sumber, Tag }) => (
+        <Tag class="card card--rep" href={link || undefined} target={link ? '_blank' : undefined} rel={link ? 'noopener' : undefined}>
+          {p.foto ? (
+          <div class="card__media card__media--square"><img src={src(p.foto)} alt={nama} loading="lazy"></div>
+          ) : (
+          <div class="card__media rep-cover" aria-hidden="true">
+            <Fragment set:html={link.includes('instagram.com') ? repIgIcon : repStarIcon} />
+            <span class="rep-cover__name">{sumber || judul}</span>
+          </div>
+          )}
+          <div class="card__body">
+            {sumber && p.foto && <p class="card__meta">{sumber}</p>}
+            <h3 class="h3">{judul}</h3>
+            {L(p, 'description', lang) && <p class="card__text card__text--clamp">{L(p, 'description', lang)}</p>}
+            {link && <span class="card__more">{t('ui.view')}<Fragment set:html={arrow} /></span>}
+          </div>
+        </Tag>
+        ))}
+      </div>
+      <button class="slider__arrow slider__arrow--next" type="button" aria-label={t('ui.next')} data-dir="1"><Fragment set:html={nextIcon} /></button>
+    </div>
+  </div>
+</section>
+</Fragment>); })()}
+
+<!-- Kontak -->
+<section class="section bg-white" id="kontak" aria-labelledby="kontak-title">
+  <img class="deco deco--bl" src={`${r}assets/img/motif/jangkar-navy.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">
+  <div class="wrap contact">
+    <div class="contact__copy">
+      <p class="eyebrow"><Fragment set:html={wave} />{t('contact.eyebrow')}</p>
+      <h2 class="h2" id="kontak-title">{t('contact.title')}</h2>
+      <p class="lead">{t('contact.lead')}</p>
+      <ul class="checklist">
+        {lines('contact.points').map((x) => <li><Fragment set:html={checkIcon} />{x}</li>)}
+      </ul>
+    </div>
+    <form class="contact-form" id="contact-form" data-cfg={contactCfg} novalidate>
+      <div class="contact-form__row">
+        <label>{t('contact.name')}<input type="text" name="name" placeholder={t('contact.namePh')} autocomplete="name" required maxlength="200"></label>
+        <label>{t('contact.business')}
+          <select name="business" required>
+            <option value="">{t('contact.businessPh')}</option>
+            {lines('contact.options').map((o) => <option>{o}</option>)}
+          </select>
+        </label>
+      </div>
+      <div class="contact-form__row">
+        <label>{t('contact.email')}<input type="email" name="email" placeholder={t('contact.emailPh')} autocomplete="email" required maxlength="254"></label>
+        <label>{t('contact.phone')}<input type="tel" name="phone" placeholder={t('contact.phonePh')} autocomplete="tel" maxlength="40"></label>
+      </div>
+      <label>{t('contact.need')}<textarea name="message" rows="4" placeholder={t('contact.needPh')} required maxlength="5000"></textarea></label>
+      <div class="contact-form__trap" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      {TURNSTILE_SITE_KEY && <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-size="flexible" data-appearance="interaction-only" data-language={lang}></div>}
+      <button class="btn btn--primary" type="submit"><Fragment set:html={mailIcon} />{t('contact.submit')}</button>
+      <p class="contact-form__status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <img src={`${r}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png`} alt={siteName} width="845" height="146" loading="lazy">
+        <p class="footer__tagline">{t('footer.tagline')}</p>
+      </div>
+      <ul class="footer__links">
+        {youtube && <li><a href={youtube} target="_blank" rel="noopener"><Fragment set:html={ytIcon} />YouTube</a></li>}
+        {instagram && <li><a href={instagram} target="_blank" rel="noopener"><Fragment set:html={igIcon} />Instagram</a></li>}
+      </ul>
+    </div>
+    <p class="footer__copy">{t('footer.copyright')}</p>
+  </div>
+</footer>
+
+<dialog class="lightbox" aria-label={t('ui.zoom_label')}>
+  <button class="lightbox__close" type="button" aria-label={t('ui.close')}><Fragment set:html={closeIcon} /></button>
+  <img class="lightbox__img" src="" alt="">
+</dialog>
+
+<script is:inline src={`${r}assets/js/site.js?v=${ver}`} defer></script>
+<script is:inline src={`${r}assets/js/contact.js?v=${ver}`} defer></script>
+{TURNSTILE_SITE_KEY && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+{CF_ANALYTICS_TOKEN && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: CF_ANALYTICS_TOKEN })}></script>}
+</body>
+</html>

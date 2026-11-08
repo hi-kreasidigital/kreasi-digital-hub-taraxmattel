@@ -1,0 +1,141 @@
+name: Build & deploy site (Astro + Supabase)
+
+# Builds the static site from Supabase and deploys it.
+#  - push to main, the admin "Publish" button (repository_dispatch) or a manual run -> build now
+#  - every 10 minutes -> build only if content changed since the last deploy
+#  - pushes to other branches -> build + upload a preview artifact (no deploy)
+# Hosting:
+#  - no Cloudflare secrets -> GitHub Pages at hi-kreasidigital.github.io/kreasi-digital-hub-taraxmattel
+#  - CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID secrets present -> Cloudflare Pages at
+#    https://taraxmattel.kreasidigitalhub.com (project + custom domain + DNS are created automatically),
+#    and the old github.io address gets redirect pages pointing to the new domain.
+#  Repo variable CUSTOM_DOMAIN overrides the domain if ever needed.
+on:
+  push:
+    branches: ["**", "!astro-preview"]
+    paths-ignore: ["docs/**", "*.md", "supabase/migrations/**"]
+  workflow_dispatch: {}
+  repository_dispatch:
+    types: [content-published]
+  schedule:
+    - cron: "*/10 * * * *"
+
+permissions:
+  contents: write   # only used to push the preview branch on non-main builds
+  pages: write
+  id-token: write
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SITE_ID: taraxmattel
+  PUBLIC_SUPABASE_URL: https://vqtcrdcpzmkahwvdsbmn.supabase.co
+  PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxdGNyZGNwem1rYWh3dmRzYm1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNTM5MjgsImV4cCI6MjEwOTYyOTkyOH0.KKGX1HlMCn4RV9pdjR0966X6SNrcOm-j9OCwAYPhMsE
+  CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN || 'taraxmattel.kreasidigitalhub.com' }}
+  ZONE_NAME: kreasidigitalhub.com
+  CF_PROJECT: ${{ vars.CF_PAGES_PROJECT || 'kreasi-digital-hub-taraxmattel' }}
+  GH_PAGES_URL: https://hi-kreasidigital.github.io/kreasi-digital-hub-taraxmattel
+  PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+  PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      skipped: ${{ steps.check.outputs.skip }}
+      mode: ${{ steps.target.outputs.mode }}
+    steps:
+      - name: Choose where the site lives
+        id: target
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CF_TOKEN" ]; then
+            echo "mode=cloudflare" >> "$GITHUB_OUTPUT"
+            echo "SITE_BASE_URL=https://$CUSTOM_DOMAIN" >> "$GITHUB_ENV"
+            echo "BASE_PATH=" >> "$GITHUB_ENV"
+          else
+            echo "mode=github" >> "$GITHUB_OUTPUT"
+            echo "SITE_BASE_URL=$GH_PAGES_URL" >> "$GITHUB_ENV"
+            echo "BASE_PATH=/kreasi-digital-hub-taraxmattel" >> "$GITHUB_ENV"
+          fi
+
+      - name: Skip if content unchanged (scheduled runs only)
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "skip=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          now=$(curl -s -X POST "$PUBLIC_SUPABASE_URL/rest/v1/rpc/site_content_version" \
+            -H "apikey: $PUBLIC_SUPABASE_ANON_KEY" -H "Content-Type: application/json" \
+            -d "{\"p_site\":\"$SITE_ID\"}" | jq -r .)
+          live=$(curl -s "$SITE_BASE_URL/version.txt" || true)
+          echo "content=$now live=$live"
+          if [ -n "$now" ] && [ "$now" = "$live" ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; else echo "skip=false" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: actions/checkout@v4
+        if: steps.check.outputs.skip != 'true'
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.skip != 'true'
+        with: { node-version: 22, cache: npm }
+      - name: Build
+        if: steps.check.outputs.skip != 'true'
+        run: npm ci && npx astro build
+      - name: Redirect pages for the old github.io address (Cloudflare mode)
+        if: steps.check.outputs.skip != 'true' && github.ref == 'refs/heads/main' && steps.target.outputs.mode == 'cloudflare'
+        run: |
+          mkdir -p gh-redirect
+          cd dist
+          find . -name '*.html' | while read -r f; do
+            p="${f#./}"; p="/${p%index.html}"; [ "$p" = "/404.html" ] && p="/"
+            mkdir -p "../gh-redirect/$(dirname "$f")"
+            url="$SITE_BASE_URL$p"
+            printf '<!doctype html><meta charset="utf-8"><title>Pindah ke %s</title><link rel="canonical" href="%s"><meta http-equiv="refresh" content="0; url=%s"><script>location.replace("%s"+location.search+location.hash)</script><a href="%s">%s</a>\n' \
+              "$url" "$url" "$url" "$url" "$url" "$url" > "../gh-redirect/$f"
+          done
+      - name: Upload for GitHub Pages
+        if: steps.check.outputs.skip != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with: { path: "${{ steps.target.outputs.mode == 'cloudflare' && 'gh-redirect' || 'dist' }}" }
+      - name: Push preview build to the astro-preview branch (other branches)
+        if: steps.check.outputs.skip != 'true' && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/astro-preview'
+        run: |
+          cd dist
+          git init -q -b astro-preview && git add -A
+          git -c user.name=preview-bot -c user.email=actions@users.noreply.github.com commit -qm "Preview of ${GITHUB_SHA::7} [skip ci]"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" astro-preview
+      - name: Deploy to Cloudflare Pages
+        if: steps.check.outputs.skip != 'true' && github.ref == 'refs/heads/main' && steps.target.outputs.mode == 'cloudflare'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          api() { curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" "$@"; }
+          A="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          # 1) project (created once)
+          if [ "$(api "$A/$CF_PROJECT" | jq -r .success)" != "true" ]; then
+            api -X POST "$A" -d "{\"name\":\"$CF_PROJECT\",\"production_branch\":\"main\"}" | jq -c '{success,errors}'
+          fi
+          # 2) upload the site
+          npx --yes wrangler@4 pages deploy dist --project-name="$CF_PROJECT" --branch=main --commit-dirty=true
+          # 3) custom domain on the project (idempotent)
+          api -X POST "$A/$CF_PROJECT/domains" -d "{\"name\":\"$CUSTOM_DOMAIN\"}" | jq -c '{success,errors}' || true
+          # 4) DNS record custom -> <project>.pages.dev (needs Zone:DNS:Edit; skipped if it exists)
+          Z=$(api "https://api.cloudflare.com/client/v4/zones?name=$ZONE_NAME" | jq -r '.result[0].id // empty')
+          if [ -n "$Z" ]; then
+            if [ "$(api "https://api.cloudflare.com/client/v4/zones/$Z/dns_records?name=$CUSTOM_DOMAIN" | jq '.result | length')" = "0" ]; then
+              api -X POST "https://api.cloudflare.com/client/v4/zones/$Z/dns_records" \
+                -d "{\"type\":\"CNAME\",\"name\":\"$CUSTOM_DOMAIN\",\"content\":\"$CF_PROJECT.pages.dev\",\"proxied\":true}" | jq -c '{success,errors}'
+            else echo "DNS record for $CUSTOM_DOMAIN already exists"; fi
+          else echo "Zone $ZONE_NAME not visible to this token; add the DNS record in the dashboard"; fi
+
+  deploy-github-pages:
+    needs: build
+    if: needs.build.outputs.skipped != 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
