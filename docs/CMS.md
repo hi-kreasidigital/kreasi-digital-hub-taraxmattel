@@ -33,7 +33,7 @@ Contact form ──► Edge Function submit-form (origin check, honeypot, Turnst
 | `src/admin/` | Admin dashboard. `tables.ts` is the content model and drives every menu and form. |
 | `src/pages/robots.txt.ts`, `version.txt.ts`, `404.astro`, `public/_headers` | noindex setup and the "skip build if unchanged" marker. |
 | `supabase/migrations/` | The tables added for this site. |
-| `supabase/functions/airtable-import-taraxmattel/`, `scripts/airtable_import.py`, `.github/workflows/migrate-airtable.yml` | The one-time Airtable copy (see below). Remove after cutover. |
+| `supabase/functions/airtable-import-taraxmattel/` | The one-time Airtable import function, kept for reference only (locked, see below). |
 | `.github/workflows/site.yml` | Build + deploy. |
 
 ## Content model (Supabase, all rows have `site_id = 'taraxmattel'`)
@@ -68,15 +68,14 @@ Tested 2026-11-08 inside a rolled-back transaction, for each of the 4 new tables
 | `TURNSTILE_SITE_KEY` | variable | Optional: the shared site key is already the default in `config.ts`. |
 | `CUSTOM_DOMAIN`, `CF_PAGES_PROJECT` | variables | Override `taraxmattel.kreasidigitalhub.com` / `kreasi-digital-hub-taraxmattel`. |
 | `CF_ANALYTICS_TOKEN` | variable | Only for hosting outside Cloudflare Pages. |
-| `AIRTABLE_TOKEN` | secret | Used only by the one-time import. Delete after cutover. |
 
 Supabase: add `https://taraxmattel.kreasidigitalhub.com/admin/` (and, while on github.io, `https://hi-kreasidigital.github.io/kreasi-digital-hub-taraxmattel/admin/`) to **Authentication → URL Configuration → Redirect URLs**.
 
 ## The one-time Airtable copy
 
-`migrate-airtable.yml` runs when `supabase/import-trigger.txt` changes. `scripts/airtable_import.py` reads Airtable with `AIRTABLE_TOKEN`, maps the rows, shrinks the photos to WebP and posts everything to the `airtable-import-taraxmattel` Edge Function. The function only accepts the call if the token can read the Airtable base, only writes `taraxmattel` rows into the five tables above, and refuses once `sites.import_locked` is true. The same workflow builds the old Python site once more from the same Airtable data and pushes it to the `parity-baseline` branch for comparison.
+Done once on 2026-11-08 and now **locked** (`sites.import_locked = true`), so it can never overwrite admin edits. The workflow `migrate-airtable.yml` and `scripts/airtable_import.py` were removed afterwards (see git history). How it worked: the script read Airtable with `AIRTABLE_TOKEN`, maps the rows, shrinks the photos to WebP and posts everything to the `airtable-import-taraxmattel` Edge Function. The function only accepts the call if the token can read the Airtable base, only writes `taraxmattel` rows into the five tables above, and refuses once `sites.import_locked` is true. The same workflow builds the old Python site once more from the same Airtable data and pushes it to the `parity-baseline` branch for comparison.
 
-Check after a run (must equal the `fingerprint` lines in the workflow log):
+The check that was run (it matched the `fingerprint` lines in the import log):
 
 ```sql
 select 'site_texts', count(*), md5(coalesce(string_agg(concat_ws('|', key, text_id, text_en), E'\n' order by key collate "C"),'')) from site_texts where site_id='taraxmattel'
@@ -86,7 +85,7 @@ union all select 'portfolio_items', count(*), md5(coalesce(string_agg(concat_ws(
 union all select 'representations', count(*), md5(coalesce(string_agg(concat_ws('|', airtable_id, status, sort_order::text, name, description_id, description_en, link), E'\n' order by airtable_id collate "C"),'')) from representations where site_id='taraxmattel';
 ```
 
-After cutover: `update public.sites set import_locked = true where id = 'taraxmattel';`, then delete the workflow, the script, `supabase/import-trigger.txt`, the `AIRTABLE_TOKEN` secret and (optionally) the Edge Function. The Airtable base stays untouched as a backup.
+The `AIRTABLE_TOKEN` repo secret is no longer used and can be deleted; the Edge Function can be deleted too. The Airtable base stays untouched as a backup.
 
 ## Local development
 

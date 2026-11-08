@@ -1,2 +1,0 @@
-Change this file to re-run the Airtable -> Supabase import (until import_locked is set).
-run 1 2026-11-08T02:56:09Z
