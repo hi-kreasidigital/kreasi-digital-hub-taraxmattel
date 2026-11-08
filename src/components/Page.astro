@@ -4,7 +4,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { about, freebies, L, portfolio, products, reps, S, T, type Lang } from '../lib/data';
-import { CF_ANALYTICS_TOKEN, GOOGLE_SITE_VERIFICATION, SITE_BASE_URL } from '../lib/config';
+import { CF_ANALYTICS_TOKEN, FORM_ENDPOINT, GOOGLE_SITE_VERIFICATION, SITE_BASE_URL, SITE_ID, TURNSTILE_SITE_KEY } from '../lib/config';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -20,7 +20,7 @@ const src = (p: string) => (/^https?:\/\//.test(p) ? p : `${r}${p}`);
 
 // cache busting: a new version string whenever the CSS or JS changes (same recipe as build.py)
 const ver = createHash('sha1')
-  .update(Buffer.concat(['css/site.css', 'js/site.js'].map((f) => readFileSync(new URL(`../../public/assets/${f}`, import.meta.url)))))
+  .update(Buffer.concat(['css/site.css', 'js/site.js', 'css/contact.css', 'js/contact.js'].map((f) => readFileSync(new URL(`../../public/assets/${f}`, import.meta.url)))))
   .digest('hex').slice(0, 10);
 
 const wave = '<svg class="eyebrow-icon" width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M1 4 Q4 1 7 4 T13 4 T19 4 T25 4"/><path d="M1 9 Q4 6 7 9 T13 9 T19 9 T25 9"/><path d="M1 14 Q4 11 7 14 T13 14 T19 14 T25 14"/></svg>';
@@ -45,7 +45,16 @@ const youtube = about.link || '';
 const instagram = about.link2 || '';
 const org = { '@context': 'https://schema.org', '@type': 'Organization', name: siteName, url: siteUrl,
   logo: `${siteUrl}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png`, sameAs: [youtube, instagram].filter(Boolean) };
-const website = { '@context': 'https://schema.org', '@type': 'WebSite', name: siteName, url: pageUrl, inLanguage: lang, description };
+
+// Contact form (posts to the shared submit-form Edge Function; entries show up in the admin and by email)
+const lines = (k: string) => t(k).split('\n').map((x) => x.trim()).filter(Boolean);
+const contactCfg = JSON.stringify({
+  url: FORM_ENDPOINT, site: SITE_ID, lang, source: lang === 'en' ? 'Kontak (EN)' : 'Kontak',
+  sending: t('contact.sending'), ok: t('contact.ok'), err: t('contact.err'), invalid: t('contact.invalid'),
+  business: t('contact.business'),
+});
+const mailIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>';
+const checkIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 
 const repCards = reps.map((p) => {
   const link = (p.link || '').startsWith('http') ? p.link : '';
@@ -77,6 +86,7 @@ const repCards = reps.map((p) => {
 <meta name="twitter:description" content={description}>
 <meta name="twitter:image" content={`${siteUrl}assets/img/og-image.jpg`}>
 <meta name="theme-color" content="#0F2A4A">
+<meta name="robots" content="noindex,nofollow">
 {GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION}>}
 <link rel="icon" type="image/png" href={`${r}assets/img/favicon.png`}>
 <link rel="apple-touch-icon" href={`${r}assets/img/apple-touch-icon.png`}>
@@ -84,8 +94,8 @@ const repCards = reps.map((p) => {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Lora:ital,wght@1,500&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
 <link rel="stylesheet" href={`${r}assets/css/site.css?v=${ver}`}>
+<link rel="stylesheet" href={`${r}assets/css/contact.css?v=${ver}`}>
 <script type="application/ld+json" set:html={JSON.stringify(org)} />
-<script type="application/ld+json" set:html={JSON.stringify(website)} />
 </head>
 <body>
 <a class="skip" href="#konten">{t('ui.skip')}</a>
@@ -93,16 +103,18 @@ const repCards = reps.map((p) => {
 <header class="topbar">
   <div class="topbar__inner">
     <a class="topbar__logo" href={home}><img src={`${r}assets/img/logo-kreasi-digital-hub-tara-x-mattel.png`} alt={siteName} width="845" height="146"></a>
-    <div class="lang" role="group" aria-label={t('ui.lang_label')} data-lang={lang}>
-      <span class="lang__pill" aria-hidden="true"></span>
-      <a class="lang__opt" href={home} hreflang="id" lang="id" aria-current={lang === 'id' ? 'true' : undefined}>ID</a>
-      <a class="lang__opt" href={`${r}en/`} hreflang="en" lang="en" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
+    <div class="topbar__actions">
+      <a class="btn btn--primary topbar__cta" href="#kontak" aria-label={t('contact.cta')}><Fragment set:html={mailIcon} /><span>{t('contact.cta')}</span></a>
+      <div class="lang" role="group" aria-label={t('ui.lang_label')} data-lang={lang}>
+        <span class="lang__pill" aria-hidden="true"></span>
+        <a class="lang__opt" href={home} hreflang="id" lang="id" aria-current={lang === 'id' ? 'true' : undefined}>ID</a>
+        <a class="lang__opt" href={`${r}en/`} hreflang="en" lang="en" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
+      </div>
     </div>
   </div>
 </header>
 
 <main id="konten">
-<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">{siteName}</h1>
 
 <!-- Tentang -->
 <section class="section bg-white" id="tentang">
@@ -271,6 +283,41 @@ const repCards = reps.map((p) => {
 </section>
 </Fragment>); })()}
 
+<!-- Kontak -->
+<section class="section bg-white" id="kontak" aria-labelledby="kontak-title">
+  <img class="deco deco--bl" src={`${r}assets/img/motif/jangkar-navy.svg`} alt="" aria-hidden="true" width="96" height="96" loading="lazy">
+  <div class="wrap contact">
+    <div class="contact__copy">
+      <p class="eyebrow"><Fragment set:html={wave} />{t('contact.eyebrow')}</p>
+      <h2 class="h2" id="kontak-title">{t('contact.title')}</h2>
+      <p class="lead">{t('contact.lead')}</p>
+      <ul class="checklist">
+        {lines('contact.points').map((x) => <li><Fragment set:html={checkIcon} />{x}</li>)}
+      </ul>
+    </div>
+    <form class="contact-form" id="contact-form" data-cfg={contactCfg} novalidate>
+      <div class="contact-form__row">
+        <label>{t('contact.name')}<input type="text" name="name" placeholder={t('contact.namePh')} autocomplete="name" required maxlength="200"></label>
+        <label>{t('contact.business')}
+          <select name="business" required>
+            <option value="">{t('contact.businessPh')}</option>
+            {lines('contact.options').map((o) => <option>{o}</option>)}
+          </select>
+        </label>
+      </div>
+      <div class="contact-form__row">
+        <label>{t('contact.email')}<input type="email" name="email" placeholder={t('contact.emailPh')} autocomplete="email" required maxlength="254"></label>
+        <label>{t('contact.phone')}<input type="tel" name="phone" placeholder={t('contact.phonePh')} autocomplete="tel" maxlength="40"></label>
+      </div>
+      <label>{t('contact.need')}<textarea name="message" rows="4" placeholder={t('contact.needPh')} required maxlength="5000"></textarea></label>
+      <div class="contact-form__trap" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      {TURNSTILE_SITE_KEY && <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-size="flexible" data-appearance="interaction-only" data-language={lang}></div>}
+      <button class="btn btn--primary" type="submit"><Fragment set:html={mailIcon} />{t('contact.submit')}</button>
+      <p class="contact-form__status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
 </main>
 
 <footer class="footer">
@@ -295,6 +342,8 @@ const repCards = reps.map((p) => {
 </dialog>
 
 <script is:inline src={`${r}assets/js/site.js?v=${ver}`} defer></script>
+<script is:inline src={`${r}assets/js/contact.js?v=${ver}`} defer></script>
+{TURNSTILE_SITE_KEY && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
 {CF_ANALYTICS_TOKEN && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: CF_ANALYTICS_TOKEN })}></script>}
 </body>
 </html>

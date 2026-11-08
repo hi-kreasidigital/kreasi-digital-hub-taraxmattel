@@ -1,0 +1,42 @@
+/* Contact section + "Hubungi kami" header button. Uses the variables from site.css. */
+
+/* ---------- header button next to the language switch */
+.topbar__actions { position: absolute; right: clamp(12px, 4vw, 64px); top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 12px; }
+.topbar__actions .lang { position: relative; right: auto; top: auto; transform: none; }
+.topbar__cta { min-height: 38px; padding: 0 16px; gap: 8px; font-size: 14px; white-space: nowrap; }
+.topbar__cta svg { flex: none; }
+@media (max-width: 1100px) {
+  .topbar__cta { width: 38px; padding: 0; }
+  .topbar__cta span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+@media (max-width: 640px) {
+  .topbar__actions { position: relative; right: auto; top: auto; transform: none; flex: none; gap: 8px; }
+  .topbar__logo img { width: min(220px, calc(100vw - 168px)); }
+  .topbar__cta { width: 34px; min-height: 32px; }
+}
+
+/* ---------- contact section */
+html { scroll-padding-top: 16px; }
+.contact { display: flex; flex-wrap: wrap; gap: clamp(32px, 5vw, 72px); align-items: flex-start; }
+.contact__copy { flex: 1 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.checklist { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-size: 16px; line-height: 1.5; }
+.checklist li { display: flex; gap: 12px; }
+.checklist svg { flex: none; margin-top: 2px; color: var(--ocean); }
+
+.contact-form { position: relative; flex: 1 1 420px; min-width: 0; background: var(--mist); border-radius: var(--radius); padding: clamp(22px, 2.6vw, 36px); display: flex; flex-direction: column; gap: 16px; }
+.contact-form label { display: flex; flex-direction: column; gap: 8px; font-size: 15px; font-weight: 500; color: var(--navy); }
+.contact-form input, .contact-form select, .contact-form textarea {
+  width: 100%; font: inherit; font-size: 16px; font-weight: 400; padding: 12px 14px; color: var(--navy);
+  background: var(--white); border: 2px solid var(--line); border-radius: var(--radius);
+}
+.contact-form input::placeholder, .contact-form textarea::placeholder { color: var(--muted); opacity: 1; }
+.contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--ocean); outline: none; }
+.contact-form textarea { resize: vertical; min-height: 130px; }
+.contact-form__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+.contact-form .btn { align-self: flex-start; border: 0; cursor: pointer; }
+.contact-form .btn:disabled { opacity: .6; cursor: wait; }
+.contact-form__trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.contact-form__status { margin: 0; font-size: 15px; color: var(--muted); min-height: 0; }
+.contact-form__status:empty { display: none; }
+.contact-form__status.is-ok { color: var(--ocean); font-weight: 500; }
+.contact-form__status.is-err { color: var(--red); }

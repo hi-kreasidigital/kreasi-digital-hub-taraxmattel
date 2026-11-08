@@ -12,9 +12,13 @@ Editor ──► /admin/ (static page, Supabase login)
 GitHub Actions (site.yml): npm ci → astro build ──► GitHub Pages now, Cloudflare Pages (taraxmattel.kreasidigitalhub.com) once the secrets exist
               ▲
    push · "Terbitkan perubahan" (repository_dispatch) · every 10 min if content changed
+
+Contact form ──► Edge Function submit-form (origin check, honeypot, Turnstile) ──► form_submissions (+ Resend email to notify_email)
 ```
 
-The site has no forms. If one is added later it must post to the `submit-form` Edge Function and carry the Turnstile widget (the site key is already the default in `src/lib/config.ts`).
+**Not in search engines, on purpose.** Every page has `<meta name="robots" content="noindex,nofollow">`, Cloudflare Pages also sends `X-Robots-Tag: noindex, nofollow` for every file (`public/_headers`), there is no sitemap, and `robots.txt` still lets crawlers in so they can read that instruction (blocking them would hide it). Visitor numbers come from Cloudflare Web Analytics, which doesn't depend on Google.
+
+**Contact form** (section `#kontak`, opened by the "Hubungi kami" button in the header): name, business type, email, WhatsApp (optional) and message. It posts to `submit-form` with `form: "kontak"`; entries appear in the admin under the form entries menu and are emailed to `sites.notify_email` (Reply-To = the visitor). The Turnstile widget is on the form (site key default in `src/lib/config.ts`). Styles and script are in the separate files `public/assets/css/contact.css` and `public/assets/js/contact.js`, so the original `site.css` / `site.js` stay untouched.
 
 ## Where things live
 
@@ -27,7 +31,7 @@ The site has no forms. If one is added later it must post to the `submit-form` E
 | `src/lib/config.ts` | Public settings, overridable by env vars (an empty value means "use the default", except `BASE_PATH`). |
 | `public/assets/` | CSS, JS, logo, motifs, default images: byte-identical to the old `assets/`. |
 | `src/admin/` | Admin dashboard. `tables.ts` is the content model and drives every menu and form. |
-| `src/pages/robots.txt.ts`, `sitemap.xml.ts`, `version.txt.ts`, `404.astro` | SEO files and the "skip build if unchanged" marker. |
+| `src/pages/robots.txt.ts`, `version.txt.ts`, `404.astro`, `public/_headers` | noindex setup and the "skip build if unchanged" marker. |
 | `supabase/migrations/` | The tables added for this site. |
 | `supabase/functions/airtable-import-taraxmattel/`, `scripts/airtable_import.py`, `.github/workflows/migrate-airtable.yml` | The one-time Airtable copy (see below). Remove after cutover. |
 | `.github/workflows/site.yml` | Build + deploy. |
@@ -40,7 +44,7 @@ The site has no forms. If one is added later it must post to the `submit-form` E
 | Freebies | `freebies` | 2 · Freebies | Cards. The section is hidden until at least one row is published (the 3 Airtable placeholders are draft). |
 | Portfolio | `portfolio_items` | 7 · Portfolio | Cards, ordered by Urutan. Empty thumbnail = built-in mockup (first three websites). |
 | Representation | `representations` | 8 · Representation | Cards. "Title \| Source" in the name: the part after `\|` is shown as the source. Links must start with `http`. |
-| Teks Situs | `site_texts` (shared) | 0 · Judul Section, 9 · Footer, and the labels that lived in `build.py` | `freebies.*`, `portfolio.*`, `representation.*` (label/title/lead per language, no ID fallback, like before), `footer.tagline`, `footer.copyright` (EN empty = same as ID), `meta.title` and `meta.description` (Google and link previews), `ui.*` (small labels). |
+| Teks Situs | `site_texts` (shared) | 0 · Judul Section, 9 · Footer, and the labels that lived in `build.py` | `freebies.*`, `portfolio.*`, `representation.*` (label/title/lead per language, no ID fallback, like before), `footer.tagline`, `footer.copyright` (EN empty = same as ID), `meta.title` and `meta.description` (browser tab and link previews), `ui.*` (small labels), `contact.*` (contact section, header button, form labels, the business-type list one per line, and the form messages). |
 
 Writing rules:
 - Paragraph fields are shown as one paragraph, like on the old site (line breaks are not turned into separate paragraphs).
@@ -61,7 +65,7 @@ Tested 2026-11-08 inside a rolled-back transaction, for each of the 4 new tables
 | Name | Type | Purpose |
 |---|---|---|
 | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` | secrets | Once both exist, every build goes to Cloudflare Pages at `https://taraxmattel.kreasidigitalhub.com`; the workflow creates the Pages project, the custom domain and the DNS record, and the old github.io address serves redirect pages. Token permissions: Account → Cloudflare Pages → Edit, Zone kreasidigitalhub.com → DNS → Edit. **Add them before merging.** |
-| `TURNSTILE_SITE_KEY` | variable | Only needed once a form exists (default already set in `config.ts`). |
+| `TURNSTILE_SITE_KEY` | variable | Optional: the shared site key is already the default in `config.ts`. |
 | `CUSTOM_DOMAIN`, `CF_PAGES_PROJECT` | variables | Override `taraxmattel.kreasidigitalhub.com` / `kreasi-digital-hub-taraxmattel`. |
 | `CF_ANALYTICS_TOKEN` | variable | Only for hosting outside Cloudflare Pages. |
 | `AIRTABLE_TOKEN` | secret | Used only by the one-time import. Delete after cutover. |
@@ -95,4 +99,5 @@ Env overrides: `SITE_ID`, `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, `SI
 
 ## Migration history
 
+- 2026-11-08: contact form section and "Hubungi kami" header button added; site set to noindex (no sitemap, no Search Console).
 - 2026-11-08: content copied from the Airtable base "Kreasi Digital Hub by Tara x Mattel" into Supabase (row counts and md5 fingerprints match Airtable), pages switched to Astro reading from Supabase, admin added at `/admin/`. The old Python generator (`build.py`, `templates/`, `data/contoh.json`, the twice-daily Airtable workflow) was removed; it stays in git history and the Airtable base is untouched.

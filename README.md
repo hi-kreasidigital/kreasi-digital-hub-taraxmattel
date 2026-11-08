@@ -16,11 +16,13 @@ dibangun oleh **GitHub Actions** (Astro) dan tayang di GitHub Pages, lalu di
 
 1. Buka `/admin/`, ketik email, klik link yang dikirim ke email.
 2. Menu **Bagian Halaman** (Tentang + 4 section produk), **Freebies**, **Portfolio**, **Representation**,
-   dan **Teks Situs** (judul section, footer, judul & deskripsi untuk Google).
+   dan **Teks Situs** (judul section, footer, teks formulir kontak).
 3. Klik **Simpan**. Hanya baris berstatus **published** yang tampil.
 4. Klik **Terbitkan perubahan**. Situs diperbarui dalam beberapa menit.
 
 Section Freebies dan Representation disembunyikan otomatis kalau belum ada baris yang published.
+Pesan dari formulir kontak (tombol **Hubungi kami**) masuk ke dashboard admin dan dikirim ke email.
+Situs ini sengaja **tidak diindeks Google** (noindex); jumlah pengunjung dilihat di Cloudflare Web Analytics.
 Gambar yang dikosongkan memakai gambar bawaan di `public/assets/img/default/`.
 
 Detail teknis (tabel, keamanan, konfigurasi, deploy): [docs/CMS.md](docs/CMS.md).
