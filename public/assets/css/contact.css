@@ -34,7 +34,8 @@ html { scroll-padding-top: 16px; }
 .contact-form textarea { resize: vertical; min-height: 130px; }
 .contact-form__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
 .contact-form .btn { align-self: flex-start; border: 0; cursor: pointer; }
-.contact-form .btn:disabled { opacity: .6; cursor: wait; }
+.contact-form .btn:disabled { opacity: .5; cursor: not-allowed; }
+.contact-form .cf-turnstile { min-height: 65px; }
 .contact-form__trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .contact-form__status { margin: 0; font-size: 15px; color: var(--muted); min-height: 0; }
 .contact-form__status:empty { display: none; }
