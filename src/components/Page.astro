@@ -295,6 +295,7 @@ const repCards = reps.map((p) => {
         {lines('contact.points').map((x) => <li><Fragment set:html={checkIcon} />{x}</li>)}
       </ul>
     </div>
+    {TURNSTILE_SITE_KEY && <script is:inline>window.txmTs={ok:false};window.txmTurnstileOk=function(){window.txmTs.ok=true};window.txmTurnstileReset=function(){window.txmTs.ok=false};</script>}
     <form class="contact-form" id="contact-form" data-cfg={contactCfg} novalidate>
       <div class="contact-form__row">
         <label>{t('contact.name')}<input type="text" name="name" placeholder={t('contact.namePh')} autocomplete="name" required maxlength="200"></label>
@@ -311,8 +312,8 @@ const repCards = reps.map((p) => {
       </div>
       <label>{t('contact.need')}<textarea name="message" rows="4" placeholder={t('contact.needPh')} required maxlength="5000"></textarea></label>
       <div class="contact-form__trap" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-      {TURNSTILE_SITE_KEY && <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-size="flexible" data-appearance="interaction-only" data-language={lang}></div>}
-      <button class="btn btn--primary" type="submit"><Fragment set:html={mailIcon} />{t('contact.submit')}</button>
+      {TURNSTILE_SITE_KEY && <div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-size="flexible" data-appearance="always" data-theme="light" data-language={lang} data-callback="txmTurnstileOk" data-expired-callback="txmTurnstileReset" data-error-callback="txmTurnstileReset" data-timeout-callback="txmTurnstileReset"></div>}
+      <button class="btn btn--primary" type="submit" disabled={TURNSTILE_SITE_KEY ? true : undefined}><Fragment set:html={mailIcon} />{t('contact.submit')}</button>
       <p class="contact-form__status" role="status" aria-live="polite"></p>
     </form>
   </div>
