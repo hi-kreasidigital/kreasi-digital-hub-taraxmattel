@@ -1,0 +1,3 @@
+# Cloudflare Pages: keep every page and file out of search results.
+/*
+  X-Robots-Tag: noindex, nofollow
