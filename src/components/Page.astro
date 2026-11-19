@@ -4,7 +4,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { about, freebies, L, portfolio, products, reps, S, T, type Lang } from '../lib/data';
-import { CF_ANALYTICS_TOKEN, FORM_ENDPOINT, GOOGLE_SITE_VERIFICATION, SITE_BASE_URL, SITE_ID, TURNSTILE_SITE_KEY } from '../lib/config';
+import { CF_ANALYTICS_TOKEN, FORM_ENDPOINT, GA_MEASUREMENT_ID, GOOGLE_SITE_VERIFICATION, SITE_BASE_URL, SITE_ID, TURNSTILE_SITE_KEY } from '../lib/config';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -96,6 +96,8 @@ const repCards = reps.map((p) => {
 <link rel="stylesheet" href={`${r}assets/css/site.css?v=${ver}`}>
 <link rel="stylesheet" href={`${r}assets/css/contact.css?v=${ver}`}>
 <script type="application/ld+json" set:html={JSON.stringify(org)} />
+{GA_MEASUREMENT_ID && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}></script>}
+{GA_MEASUREMENT_ID && <script is:inline define:vars={{ gaId: GA_MEASUREMENT_ID }}>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config',gaId);</script>}
 </head>
 <body>
 <a class="skip" href="#konten">{t('ui.skip')}</a>

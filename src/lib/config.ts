@@ -25,6 +25,11 @@ export const BASE_PATH = bp;
 // Google Search Console HTML-tag verification (empty = no tag; the old site had none).
 export const GOOGLE_SITE_VERIFICATION = env("GOOGLE_SITE_VERIFICATION", "");
 
+// Google Analytics 4 — Measurement ID "G-XXXXXXXXXX" (empty = no tracking script at all).
+// Set it as the repository variable GA_MEASUREMENT_ID (GitHub → Settings → Secrets and variables → Actions → Variables).
+const rawGa = env("PUBLIC_GA_MEASUREMENT_ID", "").toUpperCase();
+export const GA_MEASUREMENT_ID = /^G-[A-Z0-9]{4,20}$/.test(rawGa) ? rawGa : "";
+
 // Forms post to the submit-form Edge Function. This site has no form yet; if one is added it
 // must carry the Turnstile widget (Turnstile is ON in Supabase for every site).
 export const FORM_ENDPOINT = (() => {

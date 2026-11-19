@@ -39,6 +39,9 @@ env:
   GH_PAGES_URL: https://hi-kreasidigital.github.io/kreasi-digital-hub-taraxmattel
   PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
   PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.CF_ANALYTICS_TOKEN }}
+  # Google Analytics 4 + Search Console (repo variables; empty = off)
+  PUBLIC_GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+  GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
 
 jobs:
   build:
